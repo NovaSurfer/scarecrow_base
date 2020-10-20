@@ -1,0 +1,59 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Build results
+[Dd]ebug/
+build/
+
+# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
+# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+.idea/
+
+# Visual Studio Code
+.vscode/
+
+# CMake
+cmake-build-debug/
+cmake-build-release/
+bin/
+
+# Private assets
+game/data/sprites/private
+
+# OS generated files
+.DS_Store
+
+.clangd/
+
+# Python
+venv/
