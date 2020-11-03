@@ -13,6 +13,8 @@ else()
 	add_compile_options("-Wall" "-Wextra" "-Wshadow" "-Wnon-virtual-dtor" "-pedantic" "-Wpadded" "-Winvalid-pch" "$<$<CONFIG:DEBUG>:-O0>")
 endif()
 
+add_definitions("-DSC_ALLOC_WITH_HEADER")
+
 
 set(SC_MEM_SRC
     memory.h
