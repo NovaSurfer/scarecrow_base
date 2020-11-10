@@ -10,7 +10,7 @@ if(MSVC)
 	add_compile_options("/W4" "$<$<CONFIG:DEBUG>:/O0>")
 else()
 	add_compile_options("-Wall" "-Wextra" "-Wshadow" "-Wnon-virtual-dtor" "-pedantic" "-Wpadded" "$<$<CONFIG:RELEASE>:-O2>")
-	add_compile_options("-Wall" "-Wextra" "-Wshadow" "-Wnon-virtual-dtor" "-pedantic" "-Wpadded" "-Winvalid-pch" "$<$<CONFIG:DEBUG>:-O0>")
+	add_compile_options("-Wall" "-Wextra" "-Wshadow" "-Wnon-virtual-dtor" "-pedantic" "-Wpadded" "-Winvalid-pch" "-faligned-new" "$<$<CONFIG:DEBUG>:-O0>")
 endif()
 
 add_definitions("-DSC_ALLOC_WITH_HEADER")
