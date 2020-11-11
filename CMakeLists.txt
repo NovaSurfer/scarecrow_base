@@ -19,6 +19,9 @@ add_definitions("-DSC_ALLOC_WITH_HEADER")
 set(SC_MEM_SRC
     memory.h
     memory.cpp
+    allocator.h
+    heap_alloc.h
+    heap_alloc.cpp
     test.cpp)
 
 add_executable(sc_memory_test ${SC_MEM_SRC})
