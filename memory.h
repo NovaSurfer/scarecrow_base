@@ -55,7 +55,6 @@ namespace sc
 	mem& operator=(const mem&) = delete;
 	mem& operator=(mem&&) = delete;
     };
-
 }
 
 #if defined(SC_ALLOC_WITH_HEADER)
