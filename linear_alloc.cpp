@@ -19,9 +19,10 @@ namespace sc
     linear_alloc::~linear_alloc()
     {
         alloc->deallocate(membuff);
+	membuff = nullptr;
     }
 
-    // todo: align is not needed here
+    // warn: align is not needed here
     void* linear_alloc::allocate(size_t size, [[maybe_unused]] size_t align = 0)
     {
         if(free_size <= 0) {
@@ -37,7 +38,7 @@ namespace sc
 
     [[maybe_unused]] void linear_alloc::deallocate(void*) {}
 
-    size_t linear_alloc::total_allocated()
+    size_t linear_alloc::total_allocated() 
     {
         return total_size;
     }
