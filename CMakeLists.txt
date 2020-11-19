@@ -24,6 +24,8 @@ set(SC_MEM_SRC
     heap_alloc.cpp
     linear_alloc.h
     linear_alloc.cpp
+    temp_alloc.h
+    temp_alloc.cpp
     test.cpp)
 
 add_executable(sc_memory_test ${SC_MEM_SRC})

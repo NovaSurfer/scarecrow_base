@@ -2,6 +2,8 @@
 #include <cstdint>
 #include <cstdio>
 #include "memory.h"
+#include "heap_alloc.h"
+#include "temp_alloc.h"
 
 
 struct NonTrivial
@@ -34,7 +36,7 @@ int main()
     int* l2 = (int*)mem::alloc(sizeof(int) * 5);
     printf("%zu\n", mem::allocated_size(l2));
     mem::dealloc(l2);
-    
+    /*    
     NonTrivial* nont = new NonTrivial();
     printf("%zu\n", mem::allocated_size(nont));
     delete nont;
@@ -46,6 +48,21 @@ int main()
     NonTrivialAligned* nonta = new NonTrivialAligned();
     printf("%zu\n", mem::allocated_size(nonta));
     delete nonta;
+    */
+
+    heap_alloc halloc;
+    temp_alloc64 talloc(halloc);
+    long* lt = (long*)talloc.allocate(sizeof(long) * 70, 16);
+    lt[0] = 1;
+    lt[4] = 5;
+
+    long* lt2 = (long*)talloc.allocate(sizeof(long) * 70, 16);
+    lt2[0] = 1;
+    lt2[4] = 5;
+
+    
+    
+
 
     return 0;
 }
