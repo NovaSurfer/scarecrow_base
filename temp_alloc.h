@@ -9,21 +9,29 @@
 
 namespace sc
 {
-    template<size_t STACK_BUFF_SIZE>
+    /**
+     * Temporary allocator.
+     * Has a stack buffer, if it's exhausted or allocation size is bigger than STACK_BUFF_SIZE
+     * allocation will be made using the backing allocator on allocate() call.
+     * All memory will be freed on scope exit.
+     * Instantiated template versions:
+     * temp_alloc64 / 128 / ... / 4096
+     */
+    template <size_t STACK_BUFF_SIZE>
     struct temp_alloc : allocator
     {
-	temp_alloc(allocator& default_alloc);
-	~temp_alloc();
-	void* allocate(size_t size, size_t align) override;
+        temp_alloc(allocator& default_alloc);
+        ~temp_alloc();
+        void* allocate(size_t size, size_t align) override;
         void deallocate(void* ptr) override;
         size_t total_allocated() override;
 
     private:
-	char stackbuff[STACK_BUFF_SIZE];
-	allocator* alloc;
-	char* start;
-	char* current;
-	char* end;
+        char stackbuff[STACK_BUFF_SIZE];
+        allocator& alloc;
+        char* start;
+        char* current;
+        char* end;
     };
 
     using temp_alloc64 = temp_alloc<64>;

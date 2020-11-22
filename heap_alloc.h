@@ -9,7 +9,9 @@
 
 namespace sc
 {
-
+    /**
+     * Heap allocator, same as aligned malloc
+     */
     struct heap_alloc : allocator
     {
         void* allocate(size_t size, size_t align) override;

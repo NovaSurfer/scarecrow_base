@@ -6,6 +6,7 @@
 #include "memory.h"
 
 // TODO: Make it thread-safe
+// TODO: unused alloc_count
 
 namespace sc
 {

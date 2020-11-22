@@ -54,6 +54,9 @@ namespace sc
     using memhead_size_type = size_t;
     using memhead_align_type = size_t;
 
+    /**
+     * Constructs header inside @param allocated_raw_buffer.
+     */
     constexpr void construct_header(void* allocated_raw_buffer, size_t size, size_t align,
                                     memhead_type header_flags)
     {
@@ -71,6 +74,9 @@ namespace sc
         }
     }
 
+    /**
+     * Returns size of memory header.
+     */
     constexpr size_t total_mem_header_size(memhead_type header_flags)
     {
         // just size
@@ -85,6 +91,9 @@ namespace sc
         return 0;
     }
 
+    /**
+     * Returns void pointer to the user allocated space.
+     */
     constexpr sc_forceinline void* user_address(void* header_ptr, size_t header_size)
     {
         uintptr_t* p_header = static_cast<uintptr_t*>(header_ptr);
@@ -92,6 +101,9 @@ namespace sc
         return static_cast<void*>(p_user);
     }
 
+    /**
+     * Returns void pointer to the memory header allocated space.
+     */
     constexpr sc_forceinline void* header_address(void* user_ptr, size_t header_size)
     {
         uintptr_t* p_user = static_cast<uintptr_t*>(user_ptr);

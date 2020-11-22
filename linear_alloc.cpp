@@ -11,21 +11,21 @@ namespace sc
     linear_alloc::linear_alloc(allocator& default_alloc, size_t size, size_t align)
         : total_size(size)
         , free_size(size)
-        , alloc(&default_alloc)
+        , alloc(default_alloc)
         , membuff(default_alloc.allocate(size, align))
 
     {}
 
     linear_alloc::~linear_alloc()
     {
-        alloc->deallocate(membuff);
-	membuff = nullptr;
+        alloc.deallocate(membuff);
+        membuff = nullptr;
     }
 
     // warn: align is not needed here
     void* linear_alloc::allocate(size_t size, [[maybe_unused]] size_t align = 0)
     {
-        if(free_size <= 0) {
+        if(free_size <= 0 || !membuff) {
             return nullptr;
         }
 
@@ -38,13 +38,13 @@ namespace sc
 
     [[maybe_unused]] void linear_alloc::deallocate(void*) {}
 
-    size_t linear_alloc::total_allocated() 
+    size_t linear_alloc::total_allocated()
     {
         return total_size;
     }
 
     void linear_alloc::reset()
     {
-	free_size = total_size;
+        free_size = total_size;
     }
 }

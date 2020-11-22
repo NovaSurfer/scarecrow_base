@@ -14,6 +14,9 @@ namespace sc
     
 #if defined(SC_ALLOC_WITH_HEADER)
 
+    /**
+     * Memory header types
+     */
     enum class memhead_type : unsigned
     {
 	NONE = 0x00,
@@ -34,16 +37,50 @@ namespace sc
 
 #endif
 
+    /**
+     * Main memory allocation structure.
+     * Can be used for tracking memory size & alignment when SC_ALLOC_WITH_HEADER is defined.
+     */
     struct mem
     {
+	/**
+	 * Allocates @param size bytes of uninitialized storage.
+	 */
 	static void* alloc(size_t size);
+	
+	/**
+	 * Deallocates the space previously allocated by alloc().
+	 */
 	static void dealloc(void* ptr);
+	
+	/**
+	 * Allocate size bytes of uninitialized storage whose alignment is specified by alignment. 
+	 * The size parameter must be an integral multiple of alignment.
+	 */
         static void* alloc_aligned(size_t size, size_t align);
+	
+	/**
+	 * Deallocates the space previously allocated by alloc_aligned().
+	 */
         static void dealloc_aligned(void* ptr);
+	
 #if defined(SC_ALLOC_WITH_HEADER)
-        static size_t allocated_size(void* ptr);
-        static size_t allocated_alignment(void* ptr);
+        /**
+	 * Sets memory header flags.
+	 * Can be read with allocated_size(), allocated_alignment().
+	 */
 	static void set_header(memhead_type header_flags);
+	
+	/**
+	 * Returns the previously allocated size by alloc() or alloc_aligned().
+	 */
+        static size_t allocated_size(void* ptr);
+	
+	/**
+	 * Returns the alignment of the allocation made by alloc_aligned(). 
+	 */
+        static size_t allocated_alignment(void* ptr);
+
     private:
 	static memhead_type HEADER_FLAGS;
 	static size_t HEADER_SIZE;

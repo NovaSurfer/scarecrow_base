@@ -10,9 +10,12 @@
 namespace sc
 {
 
+    /**
+     * Base allocator structure
+     */
     struct allocator
     {
-	virtual void* allocate(size_t size, size_t align) = 0;
+        virtual void* allocate(size_t size, size_t align) = 0;
         virtual void deallocate(void* ptr) = 0;
         virtual size_t total_allocated() = 0;
         virtual ~allocator() {};
@@ -23,11 +26,11 @@ namespace sc
         template <typename T, typename... TArgs>
         T* make_new(const TArgs&... args);
 
-	allocator() = default;
-	allocator(const allocator&) = delete;
-	allocator(allocator&&) = delete;
-	allocator& operator=(const allocator&) = delete;
-	allocator& operator=(allocator&&) = delete;
+        allocator() = default;
+        allocator(const allocator&) = delete;
+        allocator(allocator&&) = delete;
+        allocator& operator=(const allocator&) = delete;
+        allocator& operator=(allocator&&) = delete;
     };
 
     template <typename T, typename... TArgs>
@@ -44,4 +47,3 @@ namespace sc
 }
 
 #endif //SC_ALLOCATOR_H
-
