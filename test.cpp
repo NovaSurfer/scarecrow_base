@@ -4,6 +4,7 @@
 #include "memory.h"
 #include "heap_alloc.h"
 #include "temp_alloc.h"
+#include "pool_alloc.h"
 
 
 struct NonTrivial
@@ -60,7 +61,10 @@ int main()
     lt2[0] = 1;
     lt2[4] = 5;
 
-    
+    pool_alloc palloc(halloc, sizeof(long), 15, alignof(long));
+    long* adasd = (long*)palloc.allocate();
+    printf("%zu\n", palloc.total_allocated());
+
     
 
 
