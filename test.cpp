@@ -66,7 +66,7 @@ int main()
     //long* adasd = (long*)palloc.allocate();
     //printf("%zu\n", palloc.total_allocated());
 
-    vec<int> ivec(&palloc);
+    vec<int> ivec(palloc);
 
     return 0;
 }

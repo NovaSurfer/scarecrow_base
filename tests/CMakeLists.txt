@@ -13,6 +13,8 @@ set(TEST_SOURCES
     ../pool_alloc.h
     ../pool_alloc.cpp
     ../vec.h
+
+    vec_test.cpp
     )
 
 add_executable(sc_base_test ${TEST_SOURCES})
