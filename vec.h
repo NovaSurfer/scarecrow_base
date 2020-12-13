@@ -16,9 +16,10 @@ namespace sc
     class vec
     {
     public:
-        constexpr vec(allocator* alc);
-        constexpr explicit vec(allocator* alc, size_t len);
-        constexpr vec(size_t len, const T& item);
+        constexpr vec() = delete;
+        constexpr vec(allocator& alc);
+        constexpr explicit vec(allocator& alc, size_t len);
+        constexpr vec(allocator& alc, size_t len, const T& item);
         constexpr vec(const vec& other);
         constexpr vec(vec&& other) noexcept;
         ~vec();
@@ -52,25 +53,38 @@ namespace sc
     };
 
     template <typename T>
-    constexpr vec<T>::vec(allocator* alc)
-        : alloc(alc)
+    constexpr vec<T>::vec(allocator& alc)
+        : alloc(&alc)
         , length(2)
         , space(2)
     {
         data = static_cast<T*>(alloc->allocate(sizeof(T) * 2, alignof(T)));
     }
-    
+
     template <typename T>
-    constexpr vec<T>::vec(allocator* alc, size_t len)
-        : length(len)
+    constexpr vec<T>::vec(allocator& alc, size_t len)
+        : alloc(&alc)
+        , length(len)
         , space(len)
     {
         data = static_cast<T*>(alloc->allocate(sizeof(T) * length, alignof(T)));
     }
 
     template <typename T>
+    constexpr vec<T>::vec(allocator& alc, size_t len, const T& item)
+        : alloc(&alc)
+        , length(len)
+        , space(len)
+    {
+        data = static_cast<T*>(alloc->allocate(sizeof(T) * length, alignof(T)));
+        for(size_t i = 0; i < length; ++i) {
+            data[i] = item;
+        }
+    }
+
+    template <typename T>
     constexpr vec<T>::vec(const vec& other)
-	: alloc(other.alloc)
+        : alloc(other.alloc)
         , length(other.length)
         , space(other.space)
     {
@@ -79,7 +93,7 @@ namespace sc
 
     template <typename T>
     constexpr vec<T>::vec(vec&& other) noexcept
-	: alloc(other.alloc)
+        : alloc(other.alloc)
         , length(other.length)
         , space(other.space)
     {
