@@ -41,9 +41,9 @@ namespace sc
         using type = T;
     };
 
-    /*Implementing MOVE and FORWARD
+    /* Implementing MOVE and FORWARD
      * Reference: https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/bits/move.h
-     * https://eli.thegreenplace.net/2014/perfect-forwarding-and-universal-references-in-c#id7
+     * https://eli.thegreenplace.net/2014/perfect-forwarding-and-universal-references-in-c
      */
     
     /**
