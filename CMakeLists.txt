@@ -28,6 +28,7 @@ set(SC_MEM_SRC
     temp_alloc.cpp
     pool_alloc.h
     pool_alloc.cpp
+    vec.h
     test.cpp)
 
 add_executable(sc_memory_test ${SC_MEM_SRC})
