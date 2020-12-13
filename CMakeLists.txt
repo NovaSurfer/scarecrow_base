@@ -33,3 +33,5 @@ set(SC_MEM_SRC
 
 add_executable(sc_memory_test ${SC_MEM_SRC})
 target_include_directories(sc_memory_test PUBLIC ${CMAKE_SOURCE_DIR})
+
+add_subdirectory(tests)
