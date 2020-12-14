@@ -25,9 +25,8 @@
 //
 //}
 
-    sc::heap_alloc halloc;
-    sc::pool_alloc palloc(halloc, sizeof(double), 128, alignof(double));
-
+sc::heap_alloc halloc;
+sc::pool_alloc palloc(halloc, sizeof(double), 256, alignof(double));
 
 TEST_CASE("vector-operations")
 {
@@ -37,7 +36,7 @@ TEST_CASE("vector-operations")
         sc::vec<double> v(palloc);
         CHECK(v.capacity() == 2);
     }
-    
+
     SUBCASE("constructor with size")
     {
         sc::vec<double> v(palloc, 4);
@@ -56,7 +55,7 @@ TEST_CASE("vector-operations")
         CHECK(v[3] == 5.799);
     }
 
-    /*
+    /* --- NOT SUPPORTED ---
     SUBCASE("constructor with first, last iterators")
     {
         double value = 5.799;
@@ -68,8 +67,9 @@ TEST_CASE("vector-operations")
         CHECK(v[1] == 5.799);
         CHECK(v[2] == 5.799);
         CHECK(v[3] == 5.799);
-    }
+	}*/
 
+    /* --- NOT SUPPORTED ---
     SUBCASE("constructor with initialization list")
     {
         sc::vec<double> v({1.99, 2.99, 3.99, 4.99, 5.99});
@@ -80,59 +80,59 @@ TEST_CASE("vector-operations")
         CHECK(v[3] == 4.99);
         CHECK(v[4] == 5.99);
     }
+    */
 
     SUBCASE("constructor with ref to other vector")
     {
-        sc::vec<double> v({1.99, 2.99, 3.99, 4.99, 5.99});
+        sc::vec<double> v(halloc, 10, 1.99);
         sc::vec<double> v2(v);
         CHECK(v2.capacity() == 10);
         CHECK(v2[0] == 1.99);
-        CHECK(v2[1] == 2.99);
-        CHECK(v2[2] == 3.99);
-        CHECK(v2[3] == 4.99);
-        CHECK(v2[4] == 5.99);
+        CHECK(v2[1] == 1.99);
+        CHECK(v2[2] == 1.99);
+        CHECK(v2[3] == 1.99);
+        CHECK(v2[4] == 1.99);
     }
 
     SUBCASE("constructor with lvalue ref to other vector")
     {
-        sc::vec<double> v({1.99, 2.99, 3.99, 4.99, 5.99});
-        sc::vec<double> v2(std::move(v));
+        sc::vec<double> v(halloc, 10, 1.99);
+        sc::vec<double> v2(sc::move(v));
         CHECK(v2.capacity() == 10);
         CHECK(v2[0] == 1.99);
-        CHECK(v2[1] == 2.99);
-        CHECK(v2[2] == 3.99);
-        CHECK(v2[3] == 4.99);
-        CHECK(v2[4] == 5.99);
+        CHECK(v2[1] == 1.99);
+        CHECK(v2[2] == 1.99);
+        CHECK(v2[3] == 1.99);
+        CHECK(v2[4] == 1.99);
     }
 
     SUBCASE("copy assignment operator")
     {
-        sc::vec<double> v({1.99, 2.99, 3.99, 4.99, 5.99});
-        sc::vec<double> v2(2, 5.0);
+        sc::vec<double> v(halloc, 5, 1.99);
+        sc::vec<double> v2(halloc, 2, 5.0);
         v2 = v;
-        //
-        CHECK(v2.capacity() == 10);
+        CHECK(v2.capacity() == 5);
         CHECK(v2[0] == 1.99);
-        CHECK(v2[1] == 2.99);
-        CHECK(v2[2] == 3.99);
-        CHECK(v2[3] == 4.99);
-        CHECK(v2[4] == 5.99);
+        CHECK(v2[1] == 1.99);
+        CHECK(v2[2] == 1.99);
+        CHECK(v2[3] == 1.99);
+        CHECK(v2[4] == 1.99);
     }
 
     SUBCASE("move assignment operator")
     {
-        sc::vec<double> v({1.99, 2.99, 3.99, 4.99, 5.99});
-        sc::vec<double> v2(2, 5.0);
-        v2 = std::move(v);
-
-        CHECK(v2.capacity() == 10);
+        sc::vec<double> v(halloc, 5, 1.99);
+        sc::vec<double> v2(halloc, 2, 5.0);
+        v2 = sc::move(v);
+        CHECK(v2.capacity() == 5);
         CHECK(v2[0] == 1.99);
-        CHECK(v2[1] == 2.99);
-        CHECK(v2[2] == 3.99);
-        CHECK(v2[3] == 4.99);
-        CHECK(v2[4] == 5.99);
+        CHECK(v2[1] == 1.99);
+        CHECK(v2[2] == 1.99);
+        CHECK(v2[3] == 1.99);
+        CHECK(v2[4] == 1.99);
     }
 
+    /* --- NOT SUPPORTED ---
     SUBCASE("copy assignment initializer_list")
     {
         sc::vec<double> v(2, 5.0);
@@ -145,7 +145,9 @@ TEST_CASE("vector-operations")
         CHECK(v[3] == 4.99);
         CHECK(v[4] == 5.99);
     }
+    */
 
+    /* --- NOT SUPPORTED ---
     SUBCASE("assign(size, data)")
     {
         sc::vec<double> v;
@@ -156,7 +158,9 @@ TEST_CASE("vector-operations")
         CHECK(v[2] == 10.5);
         CHECK(v[3] == 10.5);
     }
+    */
 
+    /* --- NOT SUPPORTED ---
     SUBCASE("[c]begin() | [c]end() | [c]rbegin() | [c]rend() iterators")
     {
         sc::vec<double> v({1.1, 2.1});
@@ -172,7 +176,9 @@ TEST_CASE("vector-operations")
         CHECK(*v.crbegin() == 2.1);
         CHECK(*(v.crend() - 1) == 1.1);
     }
+    */
 
+    /* --- NOT SUPPORTED ---
     SUBCASE("assign(inter_first, iter_last)")
     {
         sc::vec<double> v;
@@ -183,7 +189,9 @@ TEST_CASE("vector-operations")
         CHECK(v[1] == 3.99);
         CHECK(v[2] == 4.99);
     }
+    */
 
+    /* --- NOT SUPPORTED ---
     SUBCASE("assign(initializer_list)")
     {
         sc::vec<double> v;
@@ -193,21 +201,22 @@ TEST_CASE("vector-operations")
         CHECK(v[1] == 3.99);
         CHECK(v[2] == 4.99);
     }
+    */
 
     SUBCASE("size()")
     {
-        sc::vec<double> v({1.1});
-        v.push_back(2.2);
-        v.push_back(3.3);
+        sc::vec<double> v(halloc, 1, 1.1);
+        v.push(2.2);
+        v.push(3.3);
         CHECK(v.size() == 3);
         CHECK(v.capacity() == 4);
     }
 
     SUBCASE("resize()")
     {
-        sc::vec<double> v({1.1});
-        v.push_back(2.2);
-        v.push_back(3.3);
+        sc::vec<double> v(halloc, 1, 1.1);
+        v.push(2.2);
+        v.push(3.3);
         CHECK(v.size() == 3);
 
         // Increasing size
@@ -218,9 +227,9 @@ TEST_CASE("vector-operations")
         CHECK(v[1] == 2.2);
         CHECK(v[2] == 3.3);
 
-        v.push_back(4.4);
-        v.push_back(5.5);
-        v.push_back(6.6);
+        v.push(4.4);
+        v.push(5.5);
+        v.push(6.6);
 
         CHECK(v.size() == 8);
 
@@ -232,7 +241,7 @@ TEST_CASE("vector-operations")
 
     SUBCASE("reserve()")
     {
-        sc::vec<double> v({1.1});
+        sc::vec<double> v(halloc, 1, 1.1);
         v.reserve(5);
         CHECK(v.size() == 1);
         CHECK(v.capacity() == 5);
@@ -240,9 +249,9 @@ TEST_CASE("vector-operations")
 
     SUBCASE("shrink_to_fit()")
     {
-        sc::vec<double> v({1.1});
-        v.push_back(2.2);
-        v.push_back(3.3);
+        sc::vec<double> v(halloc, 1, 1.1);
+        v.push(2.2);
+        v.push(3.3);
         CHECK(v.size() == 3);
         CHECK(v.capacity() == 4);
         v.shrink_to_fit();
@@ -251,37 +260,42 @@ TEST_CASE("vector-operations")
         CHECK(v.capacity() == 3);
     }
 
+    /* --- NOT SUPPORTED ---
     SUBCASE("at()")
     {
         sc::vec<double> v({1.1, 2.2, 3.3});
         CHECK(v.at(1) == 2.2);
     }
+    */
 
+    /* --- NOT SUPPORTED ---
     SUBCASE("front() & back()")
     {
         sc::vec<double> v({1.1, 2.2, 3.3});
         CHECK(v.front() == 1.1);
         CHECK(v.back() == 3.3);
     }
+    */
 
     SUBCASE("data()")
     {
-        sc::vec<double> v({1.1, 2.2, 3.3});
-        CHECK(v[0] == *v.data());
+        sc::vec<double> v(halloc, 1, 1.1);
+        CHECK(v[0] == *v.raw());
     }
 
     SUBCASE("emplace_back()")
     {
-        sc::vec<double> v;
-        v.emplace_back(1.1);
-        v.emplace_back(2.1);
-        v.emplace_back(3.1);
+        sc::vec<double> v(halloc);
+        v.emplace(1.1);
+        v.emplace(2.1);
+        v.emplace(3.1);
 
         CHECK(v[0] == 1.1);
         CHECK(v[1] == 2.1);
         CHECK(v[2] == 3.1);
     }
 
+    /*
     SUBCASE("pop_back()")
     {
         sc::vec<double> v({1.1, 2.2, 3.3, 4.4});
