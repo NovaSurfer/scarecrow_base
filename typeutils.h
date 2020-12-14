@@ -45,15 +45,15 @@ namespace sc
      * Reference: https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/bits/move.h
      * https://eli.thegreenplace.net/2014/perfect-forwarding-and-universal-references-in-c
      */
-    
+
     /**
      * Converts value to rvalue
      * @return the parameter cast to an rvalue-reference to allow moving it.
      */
     template <class T>
-    [[nodiscard]] constexpr remove_reference<T>&& move(T&& _Arg) noexcept
+    [[nodiscard]] constexpr typename remove_reference<T>::type&& move(T&& _Arg) noexcept
     {
-        return static_cast<remove_reference<T>&&>(_Arg);
+        return static_cast<typename remove_reference<T>::type&&>(_Arg);
     }
 
     /**
