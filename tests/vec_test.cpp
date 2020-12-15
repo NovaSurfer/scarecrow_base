@@ -202,7 +202,7 @@ TEST_CASE("vector-operations")
         CHECK(v[2] == 4.99);
     }
     */
-
+    
     SUBCASE("size()")
     {
         sc::vec<double> v(halloc, 1, 1.1);
@@ -277,11 +277,24 @@ TEST_CASE("vector-operations")
     }
     */
 
-    SUBCASE("data()")
+    SUBCASE("raw()")
     {
         sc::vec<double> v(halloc, 1, 1.1);
         CHECK(v[0] == *v.raw());
     }
+
+    SUBCASE("push_back()")
+    {
+        sc::vec<double> v(halloc);
+        v.push(1.1);
+        v.push(2.1);
+        v.push(3.1);
+
+        CHECK(v[0] == 1.1);
+        CHECK(v[1] == 2.1);
+        CHECK(v[2] == 3.1);
+    }
+
 
     SUBCASE("emplace_back()")
     {
@@ -295,14 +308,17 @@ TEST_CASE("vector-operations")
         CHECK(v[2] == 3.1);
     }
 
-    /*
     SUBCASE("pop_back()")
     {
-        sc::vec<double> v({1.1, 2.2, 3.3, 4.4});
+        sc::vec<double> v(halloc, 1, 1.1);
+        v.push(2.2);
+        v.push(3.3);
+        v.push(4.4);
         v.pop_back();
-        CHECK(v.back() == v[2]);
+        CHECK(v[v.size() - 1] == v[2]);
     }
 
+    /* --- NOT SUPPORTED ---
     SUBCASE("emplace()")
     {
         sc::vec<double> v({1.1, 2.2, 3.3});
