@@ -30,6 +30,7 @@ namespace sc
         void reserve(size_t capacity);
         void resize(size_t new_size);
         void shrink_to_fit();
+        void pop_back();
 
         void push(const T& item);
         template <typename... Args>
@@ -84,19 +85,27 @@ namespace sc
 
     template <typename T>
     constexpr vec<T>::vec(const vec& other)
-        : data(other.data)
-        , alloc(other.alloc)
+        : alloc(other.alloc)
         , sz(other.sz)
         , space(other.space)
-    {}
+    {
+        data = static_cast<T*>(alloc->allocate(sizeof(T) * sz, alignof(T)));
+        for(size_t i = 0; i < sz; ++i) {
+            data[i] = other.data[i];
+        }
+    }
 
     template <typename T>
     constexpr vec<T>::vec(vec&& other) noexcept
-        : data(move(other.data))
-        , alloc(move(other.alloc))
+        : alloc(move(other.alloc))
         , sz(move(other.sz))
         , space(move(other.space))
-    {}
+    {
+        data = static_cast<T*>(alloc->allocate(sizeof(T) * sz, alignof(T)));
+        for(size_t i = 0; i < sz; ++i) {
+            data[i] = move(other.data[i]);
+        }
+    }
 
     template <typename T>
     vec<T>::~vec()
@@ -229,6 +238,12 @@ namespace sc
             data = new_data;
             space = sz;
         }
+    }
+
+    template <typename T>
+    void vec<T>::pop_back()
+    {
+        data[--sz].~T();
     }
 
     template <typename T>
