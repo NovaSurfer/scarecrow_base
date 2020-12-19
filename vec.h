@@ -10,6 +10,8 @@
 
 struct allocator;
 
+// TODO add placement-new for allocated memory and uncomment ~T() calls;
+
 namespace sc
 {
     template <typename T>
@@ -60,6 +62,10 @@ namespace sc
         , space(2)
     {
         data = static_cast<T*>(alloc->allocate(sizeof(T) * 2, alignof(T)));
+        if constexpr(!is_trivial_v<T>) {
+            data[0] = T();
+            data[1] = T();
+        }
     }
 
     template <typename T>
@@ -68,7 +74,12 @@ namespace sc
         , sz(0)
         , space(len)
     {
-        data = static_cast<T*>(alloc->allocate(sizeof(T) * sz, alignof(T)));
+        data = static_cast<T*>(alloc->allocate(sizeof(T) * space, alignof(T)));
+        if constexpr(!is_trivial_v<T>) {
+            for(size_t i = 0; i < space; ++i) {
+                data[i] = T();
+            }
+        }
     }
 
     template <typename T>
@@ -110,11 +121,11 @@ namespace sc
     template <typename T>
     vec<T>::~vec()
     {
-        if constexpr(!is_trivial_v<T>) {
+        /*if constexpr(!is_trivial_v<T>) {
             for(size_t i = 0; i < sz; ++i) {
-                data[i]->~T();
+                data[i].~T();
             }
-        }
+	    }*/
 
         alloc->deallocate(data);
         data = nullptr;
@@ -175,12 +186,12 @@ namespace sc
             for(size_t i = 0; i < sz; ++i) {
                 new_data[i] = data[i];
             }
-
+            /*
             if constexpr(!is_trivial_v<T>) {
                 for(size_t i = 0; i < sz; ++i) {
-                    data[i]->~T();
+                    data[i].~T();
                 }
-            }
+		}*/
 
             alloc->deallocate(data);
 
@@ -199,22 +210,22 @@ namespace sc
 
             if constexpr(!is_trivial_v<T>) {
                 for(size_t i = sz; i != new_size; ++i) {
-                    new(&data[i]) T();
+                    data[i] = T();
                 }
             }
-
-            sz = new_size;
 
         } else if(sz > new_size) {
             // if T is non-POD
+
+            /*
             if constexpr(!is_trivial_v<T>) {
                 for(size_t i = sz; i != new_size; --i) {
-                    data[i]->~T();
+                    data[i].~T();
                 }
-            }
-
-            sz = new_size;
+		}*/
         }
+
+        sz = new_size;
     }
 
     template <typename T>
@@ -227,11 +238,12 @@ namespace sc
                 new_data[i] = data[i];
             }
 
+            /*
             if constexpr(!is_trivial_v<T>) {
                 for(size_t i = 0; i < sz; ++i) {
-                    data[i]->~T();
+                    data[i].~T();
                 }
-            }
+		}*/
 
             alloc->deallocate(data);
 
@@ -243,7 +255,9 @@ namespace sc
     template <typename T>
     void vec<T>::pop_back()
     {
+
         data[--sz].~T();
+        //--sz;
     }
 
     template <typename T>
