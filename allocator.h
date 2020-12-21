@@ -5,7 +5,9 @@
 #ifndef SC_ALLOCATOR_H
 #define SC_ALLOCATOR_H
 
+#include "typeutils.h"
 #include <cstddef>
+#include <new>
 
 namespace sc
 {
@@ -21,10 +23,9 @@ namespace sc
         virtual ~allocator() {};
 
         template <typename T, typename... TArgs>
-        T* make_new(TArgs&... args);
-
-        template <typename T, typename... TArgs>
-        T* make_new(const TArgs&... args);
+        T* make_new(TArgs&&... args);
+        template <typename T>
+        void make_delete(const T* ptr);
 
         allocator() = default;
         allocator(const allocator&) = delete;
@@ -34,16 +35,20 @@ namespace sc
     };
 
     template <typename T, typename... TArgs>
-    T* allocator::make_new(TArgs&... args)
+    T* allocator::make_new(TArgs&&... args)
     {
-        return new(allocate(sizeof(T), alignof(T))) T(args...);
+        return new(allocate(sizeof(T), alignof(T))) T(sc::forward<TArgs>(args)...);
     }
 
-    template <typename T, typename... TArgs>
-    T* allocator::make_new(const TArgs&... args)
+    template <typename T>
+    void allocator::make_delete(const T* ptr)
     {
-        return new(allocate(sizeof(T), alignof(T))) T(args...);
+        if(ptr) {
+            ptr->~T();
+            deallocate(ptr);
+        }
     }
+
 }
 
 #endif //SC_ALLOCATOR_H
