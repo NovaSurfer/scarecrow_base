@@ -10,15 +10,13 @@
 
 struct allocator;
 
-// TODO add placement-new for allocated memory and uncomment ~T() calls;
-
 namespace sc
 {
     template <typename T>
     class vec
     {
     public:
-        //constexpr vec() = delete;
+        constexpr vec() = delete;
         constexpr vec(allocator& alc);
         constexpr explicit vec(allocator& alc, size_t len);
         constexpr vec(allocator& alc, size_t len, const T& item);
@@ -26,8 +24,9 @@ namespace sc
         constexpr vec(vec&& other) noexcept;
         ~vec();
 
-        constexpr vec<T>& operator=(const vec<T>& v);
-        constexpr vec<T>& operator=(vec<T>&& v);
+        // TODO:
+        constexpr vec<T>& operator=(const vec<T>& v) = delete;
+        constexpr vec<T>& operator=(vec<T>&& v) = delete;
 
         void reserve(size_t capacity);
         void resize(size_t new_size);
@@ -61,7 +60,7 @@ namespace sc
         , sz(0)
         , space(2)
     {
-        data = static_cast<T*>(alloc->allocate(sizeof(T) * 2, alignof(T)));
+        data = static_cast<T*>(alloc->allocate(sizeof(T) * space, alignof(T)));
         if constexpr(!is_trivial_v<T>) {
             data[0] = T();
             data[1] = T();
@@ -71,7 +70,7 @@ namespace sc
     template <typename T>
     constexpr vec<T>::vec(allocator& alc, size_t len)
         : alloc(&alc)
-        , sz(0)
+        , sz(len)
         , space(len)
     {
         data = static_cast<T*>(alloc->allocate(sizeof(T) * space, alignof(T)));
@@ -88,9 +87,9 @@ namespace sc
         , sz(len)
         , space(len)
     {
-        data = static_cast<T*>(alloc->allocate(sizeof(T) * sz, alignof(T)));
+        data = static_cast<T*>(alloc->allocate(sizeof(T) * space, alignof(T)));
         for(size_t i = 0; i < sz; ++i) {
-            data[i] = item;
+            new(static_cast<void*>(data + i)) T(item);
         }
     }
 
@@ -100,9 +99,9 @@ namespace sc
         , sz(other.sz)
         , space(other.space)
     {
-        data = static_cast<T*>(alloc->allocate(sizeof(T) * sz, alignof(T)));
+        data = static_cast<T*>(alloc->allocate(sizeof(T) * space, alignof(T)));
         for(size_t i = 0; i < sz; ++i) {
-            data[i] = other.data[i];
+            new(static_cast<void*>(data + i)) T(other.data[i]);
         }
     }
 
@@ -111,17 +110,14 @@ namespace sc
         : alloc(move(other.alloc))
         , sz(move(other.sz))
         , space(move(other.space))
-    {
-        data = static_cast<T*>(alloc->allocate(sizeof(T) * sz, alignof(T)));
-        for(size_t i = 0; i < sz; ++i) {
-            data[i] = move(other.data[i]);
-        }
-    }
+        , data(move(other.data))
+    {}
 
     template <typename T>
     vec<T>::~vec()
     {
-        /*if constexpr(!is_trivial_v<T>) {
+        /*
+        if constexpr(!is_trivial_v<T>) {
             for(size_t i = 0; i < sz; ++i) {
                 data[i].~T();
             }
@@ -132,7 +128,7 @@ namespace sc
         sz = 0;
         space = 0;
     }
-
+    /*
     template <typename T>
     constexpr vec<T>& vec<T>::operator=(const vec<T>& v)
     {
@@ -143,7 +139,7 @@ namespace sc
 
         if(v.sz > space) {
             this->~vec<T>();
-            data = static_cast<T*>(alloc->allocate(sizeof(T) * v.sz, alignof(T)));
+            data = static_cast<T*>(alloc->allocate(sizeof(T) * v.space, alignof(T)));
             space = v.sz;
         }
 
@@ -176,25 +172,21 @@ namespace sc
         sz = move(v.sz);
         return *this;
     }
+    */
 
     template <typename T>
     void vec<T>::reserve(size_t capacity)
     {
         if(capacity > space) {
+
             T* new_data = (T*)alloc->allocate(sizeof(T) * capacity, alignof(T));
 
+            // WARN: UB if T() ctor throw
             for(size_t i = 0; i < sz; ++i) {
-                new_data[i] = data[i];
+                new(static_cast<void*>(new_data + i)) T(data[i]);
             }
-            /*
-            if constexpr(!is_trivial_v<T>) {
-                for(size_t i = 0; i < sz; ++i) {
-                    data[i].~T();
-                }
-		}*/
 
             alloc->deallocate(data);
-
             data = new_data;
             space = capacity;
         }
@@ -255,9 +247,8 @@ namespace sc
     template <typename T>
     void vec<T>::pop_back()
     {
-
-        data[--sz].~T();
-        //--sz;
+        //data[sz].~T();
+        --sz;
     }
 
     template <typename T>
