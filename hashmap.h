@@ -1,5 +1,6 @@
 #include "allocator.h"
 #include "hash.h"
+#include <bits/stdint-uintn.h>
 #include <cstdio>
 
 namespace sc
@@ -16,9 +17,9 @@ namespace sc
 
             K key;
             V value;
+            uint32_t dib;
 
         private:
-            uint32_t dib;
         };
 
         struct kv_iter
@@ -86,8 +87,9 @@ namespace sc
         iter begin();
         iter end();
 
-    private:
         kv_pair* kvps;
+
+    private:
         allocator* alloc;
         uint32_t size;
         uint32_t capacity;
@@ -131,15 +133,13 @@ namespace sc
         to_insert.dib = 0;
 
         for(uint32_t i = index;; i = (i + 1) % capacity) {
-            if(kvps[i].dib == 0xffffffffU) {
+            if(kvps[i].key == 0xffffffffU) {
                 kvps[i] = to_insert;
                 ++size;
+                printf("ON INSERT: kvps[%d].dib=%d\n", i, to_insert.dib);
                 return true;
             } else if(kvps[i].dib < to_insert.dib) {
                 sc::swap(to_insert, kvps[i]);
-                // kv_pair temp = to_insert;
-                // to_insert = kvps[i];
-                // kvps[i] = temp;
             }
             ++to_insert.dib;
         }
@@ -167,16 +167,29 @@ namespace sc
     {
         // get the index for the intial key that will be deleted
         uint32_t index = hash(key) % capacity;
-        printf("index:%d\n", index);
-        for(;; index = (index + 1) % capacity) {
+        //printf("index:%d\n", index);
+        for(uint32_t i = 0; i <= capacity; ++i) {
+            index = (index + 1) % capacity;
             if(kvps[index].key == key) {
-                // TODO: 1) Find "stop" bucket
-                //          empty bucket or DIB that equal to 0.
-                //       2) Shift elements backward between deleted and stop buckets.
-		
+                break;
+            }
+        }
+        // 1) Find "stop" bucket
+        //    empty bucket or DIB that equal to 0.
+        // 2) Shift elements backward between deleted and stop buckets.
+        uint32_t prev_index = index;
+        uint32_t swap_index;
+        for(uint32_t i = 1; i < capacity; ++i) {
+            uint32_t prev_index = (index + i - 1) % capacity;
+            uint32_t swap_index = (index + i) % capacity;
+            if(kvps[swap_index].key == 0xffffffffU || kvps[swap_index].dib == 0) {
+                kvps[prev_index].key = 0xffffffffU;
                 --size;
                 return;
             }
+            printf("BEFORE SWAP: kvps[%d].dib=%d\n", swap_index, kvps[swap_index].dib);
+            --kvps[swap_index].dib;
+            kvps[prev_index] = kvps[swap_index];
         }
     }
 
