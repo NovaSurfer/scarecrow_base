@@ -21,6 +21,24 @@ namespace sc
     inline constexpr bool is_trivial_v = __is_trivial(T);
 
     /**
+     * Determine whether T is a pointer
+     */
+    template <typename>
+    inline constexpr bool is_pointer_v = false; 
+
+    template <typename T>
+    inline constexpr bool is_pointer_v<T*> = true;
+
+    template <typename T>
+    inline constexpr bool is_pointer_v<T* const> = true;
+
+    template <typename T>
+    inline constexpr bool is_pointer_v<T* volatile> = true;
+
+    template <typename T>
+    inline constexpr bool is_pointer_v<T* const volatile> = true;
+
+    /**
      * Remove reference
      */
     template <typename T>
@@ -74,6 +92,14 @@ namespace sc
     constexpr T&& forward(typename remove_reference<T>::type&& t) noexcept
     {
         return static_cast<T&&>(t);
+    }
+
+    template <typename T>
+    void swap(T& t1, T& t2)
+    {
+        T temp = move(t1);
+        t1 = move(t2);
+        t2 = move(temp);
     }
 
 }
