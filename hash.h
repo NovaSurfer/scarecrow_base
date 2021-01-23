@@ -18,7 +18,7 @@ namespace sc
     uint32_t hash(const char* key)
     {
         uint32_t result[1];
-        MurmurHash3_x86_32(key, strlen(key), HASH_SEED, result);
+        MurmurHash3_x86_32(&key, strlen(key), HASH_SEED, result);
         return *result;
     }
 }
