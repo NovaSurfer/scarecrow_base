@@ -13,8 +13,14 @@ set(TEST_SOURCES
     ../pool_alloc.h
     ../pool_alloc.cpp
     ../vec.h
+    ../MurmurHash3.h
+    ../MurmurHash3.cpp
+    ../hash.h
+    ../hashmap.h
+
 
     vec_test.cpp
+    hashmap_test.cpp
     )
 
 add_executable(sc_base_test ${TEST_SOURCES})
