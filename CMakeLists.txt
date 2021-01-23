@@ -29,6 +29,10 @@ set(SC_MEM_SRC
     pool_alloc.h
     pool_alloc.cpp
     vec.h
+    MurmurHash3.h
+    MurmurHash3.cpp
+    hash.h
+    hashmap.h
     test.cpp)
 
 add_executable(sc_memory_test ${SC_MEM_SRC})
