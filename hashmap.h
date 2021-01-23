@@ -5,6 +5,11 @@
 
 namespace sc
 {
+    template <typename T>
+    constexpr inline T DEFVAL = nullptr;
+
+    template <>
+    constexpr inline uint32_t DEFVAL<uint32_t> = 0xffffffffU;
 
     template <typename K, typename V>
     class hashmap
@@ -17,6 +22,7 @@ namespace sc
 
             K key;
             V value;
+
             uint32_t dib;
 
         private:
@@ -33,7 +39,7 @@ namespace sc
                 if(id == 0) {
                     // find first non-empty bucket
                     for(uint32_t i = 0; i < capacity; ++i) {
-                        if(kvps[i].dib != 0xffffffffU) {
+                        if(kvps[i].key != DEFVAL<K>) {
                             id = i;
                             return;
                         }
@@ -45,7 +51,7 @@ namespace sc
             {
                 ++id;
                 for(; id < capacity; ++id) {
-                    if(kvps[id].dib != 0xffffffffU) {
+                    if(kvps[id].key != DEFVAL<K>) {
                         return *this;
                     }
                 }
@@ -80,8 +86,8 @@ namespace sc
         hashmap(allocator& default_alloc);
         ~hashmap();
         void init(size_t capacity);
-        bool put(K key, const V& value);
-        const V get(const K& key) const;
+        bool put(const K& key, const V& value);
+        V get(const K& key) const;
         void remove(const K& key);
         uint32_t len() const;
         iter begin();
@@ -116,38 +122,46 @@ namespace sc
     {
         this->capacity = capacity;
         kvps = static_cast<kv_pair*>(alloc->allocate(capacity * sizeof(kv_pair), alignof(kv_pair)));
-        memset(kvps, 0xffffffffU, sizeof(kv_pair) * capacity);
+        if constexpr(is_pointer_v<K>) {
+            memset(kvps, 0, sizeof(kv_pair) * capacity);
+        } else {
+            memset(kvps, 0xffffffffU, sizeof(kv_pair) * capacity);
+        }
     }
 
     template <typename K, typename V>
-    bool hashmap<K, V>::put(K key, const V& value)
+    bool hashmap<K, V>::put(const K& key, const V& value)
     {
         if(size == capacity) {
             return false;
         }
 
-        const uint32_t index = hash(key) % capacity;
-        kv_pair to_insert;
-        to_insert.key = key;
-        to_insert.value = value;
-        to_insert.dib = 0;
+        const uint32_t init_index = hash(key) % capacity;
+        kv_pair to_insert {key, value, 0};
 
-        for(uint32_t i = index;; i = (i + 1) % capacity) {
-            if(kvps[i].key == 0xffffffffU) {
-                kvps[i] = to_insert;
+        for(uint32_t i = 0, current_index = init_index; i < capacity;
+            ++i, current_index = (init_index + i) % capacity) {
+
+            if(kvps[current_index].key == DEFVAL<K>) {
+                kvps[current_index] = to_insert;
                 ++size;
-                printf("ON INSERT: kvps[%d].dib=%d\n", i, to_insert.dib);
                 return true;
-            } else if(kvps[i].dib < to_insert.dib) {
-                sc::swap(to_insert, kvps[i]);
+            } else if(kvps[current_index].key == to_insert.key) {
+                sc::swap(to_insert, kvps[current_index]);
+                return true;
+            } else {
+                if(kvps[current_index].dib < to_insert.dib) {
+                    sc::swap(to_insert, kvps[current_index]);
+                }
             }
             ++to_insert.dib;
         }
+
         return false;
     }
 
     template <typename K, typename V>
-    const V hashmap<K, V>::get(const K& key) const
+    V hashmap<K, V>::get(const K& key) const
     {
         uint32_t key_hash = hash(key);
         uint32_t index = key_hash % capacity;
@@ -167,7 +181,6 @@ namespace sc
     {
         // get the index for the intial key that will be deleted
         uint32_t index = hash(key) % capacity;
-        //printf("index:%d\n", index);
         for(uint32_t i = 0; i <= capacity; ++i) {
             index = (index + 1) % capacity;
             if(kvps[index].key == key) {
@@ -182,12 +195,11 @@ namespace sc
         for(uint32_t i = 1; i < capacity; ++i) {
             uint32_t prev_index = (index + i - 1) % capacity;
             uint32_t swap_index = (index + i) % capacity;
-            if(kvps[swap_index].key == 0xffffffffU || kvps[swap_index].dib == 0) {
-                kvps[prev_index].key = 0xffffffffU;
+            if(kvps[swap_index].key == DEFVAL<K> || kvps[swap_index].dib == 0) {
+                kvps[prev_index].key = DEFVAL<K>;
                 --size;
                 return;
             }
-            printf("BEFORE SWAP: kvps[%d].dib=%d\n", swap_index, kvps[swap_index].dib);
             --kvps[swap_index].dib;
             kvps[prev_index] = kvps[swap_index];
         }
@@ -210,4 +222,5 @@ namespace sc
     {
         return kv_iter(kvps, capacity, 0xffffffffU);
     }
+
 }
