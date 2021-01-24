@@ -1,7 +1,5 @@
 #include "allocator.h"
 #include "hash.h"
-#include <bits/stdint-uintn.h>
-#include <cstdio>
 
 namespace sc
 {
@@ -23,9 +21,8 @@ namespace sc
             K key;
             V value;
 
-            uint32_t dib;
-
         private:
+            uint32_t dib;
         };
 
         struct kv_iter
@@ -80,29 +77,28 @@ namespace sc
             uint32_t id;
         };
 
-    public:
         using iter = kv_iter;
 
-        hashmap(allocator& default_alloc);
+    public:
+        constexpr hashmap(allocator& default_alloc);
         ~hashmap();
-        void init(size_t capacity);
-        bool put(const K& key, const V& value);
-        V get(const K& key) const;
-        void remove(const K& key);
-        uint32_t len() const;
-        iter begin();
-        iter end();
-
-        kv_pair* kvps;
+        constexpr void init(size_t capacity);
+        constexpr bool put(const K& key, const V& value);
+        constexpr V get(const K& key) const;
+        constexpr void remove(const K& key);
+        constexpr uint32_t len() const;
+        constexpr iter begin() const;
+        constexpr iter end() const;
 
     private:
         allocator* alloc;
+        kv_pair* kvps;
         uint32_t size;
         uint32_t capacity;
     };
 
     template <typename K, typename V>
-    hashmap<K, V>::hashmap(allocator& default_alloc)
+    constexpr hashmap<K, V>::hashmap(allocator& default_alloc)
         : alloc(&default_alloc)
         , kvps(nullptr)
         , size(0)
@@ -118,7 +114,7 @@ namespace sc
     }
 
     template <typename K, typename V>
-    void hashmap<K, V>::init(size_t capacity)
+    constexpr void hashmap<K, V>::init(size_t capacity)
     {
         this->capacity = capacity;
         kvps = static_cast<kv_pair*>(alloc->allocate(capacity * sizeof(kv_pair), alignof(kv_pair)));
@@ -130,14 +126,17 @@ namespace sc
     }
 
     template <typename K, typename V>
-    bool hashmap<K, V>::put(const K& key, const V& value)
+    constexpr bool hashmap<K, V>::put(const K& key, const V& value)
     {
         if(size == capacity) {
             return false;
         }
 
         const uint32_t init_index = hash(key) % capacity;
-        kv_pair to_insert {key, value, 0};
+        kv_pair to_insert;
+        to_insert.key = key;
+        to_insert.value = value;
+        to_insert.dib = 0;
 
         for(uint32_t i = 0, current_index = init_index; i < capacity;
             ++i, current_index = (init_index + i) % capacity) {
@@ -149,10 +148,8 @@ namespace sc
             } else if(kvps[current_index].key == to_insert.key) {
                 sc::swap(to_insert, kvps[current_index]);
                 return true;
-            } else {
-                if(kvps[current_index].dib < to_insert.dib) {
-                    sc::swap(to_insert, kvps[current_index]);
-                }
+            } else if(kvps[current_index].dib < to_insert.dib) {
+                sc::swap(to_insert, kvps[current_index]);
             }
             ++to_insert.dib;
         }
@@ -161,7 +158,7 @@ namespace sc
     }
 
     template <typename K, typename V>
-    V hashmap<K, V>::get(const K& key) const
+    constexpr V hashmap<K, V>::get(const K& key) const
     {
         uint32_t key_hash = hash(key);
         uint32_t index = key_hash % capacity;
@@ -177,7 +174,7 @@ namespace sc
     }
 
     template <typename K, typename V>
-    void hashmap<K, V>::remove(const K& key)
+    constexpr void hashmap<K, V>::remove(const K& key)
     {
         // get the index for the intial key that will be deleted
         uint32_t index = hash(key) % capacity;
@@ -206,21 +203,20 @@ namespace sc
     }
 
     template <typename K, typename V>
-    uint32_t hashmap<K, V>::len() const
+    constexpr uint32_t hashmap<K, V>::len() const
     {
         return size;
     }
 
     template <typename K, typename V>
-    typename hashmap<K, V>::iter hashmap<K, V>::begin()
+    constexpr typename hashmap<K, V>::iter hashmap<K, V>::begin() const
     {
         return kv_iter(kvps, capacity, 0);
     }
 
     template <typename K, typename V>
-    typename hashmap<K, V>::iter hashmap<K, V>::end()
+    constexpr typename hashmap<K, V>::iter hashmap<K, V>::end() const
     {
         return kv_iter(kvps, capacity, 0xffffffffU);
     }
-
 }
