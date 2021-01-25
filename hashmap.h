@@ -1,3 +1,22 @@
+/**
+ * Hashmap with open addressing and Robin Hood reordering scheme.
+ * Backward shift deleteion.
+ *
+ * - Cannot grow
+ * - Only for POD types
+ * - Supports custom allocator
+ * - Supports range-based for loop
+ *
+ * Usage:
+ * \code{.cpp}
+ *     sc::hashmap<uint32_t Pod> hmap(allocator);
+ *     hmap.init(size);
+ *     hmap.put(2077, {1, 2, 3});
+ *     Pod val = hmap.get(2077);
+ *     for(auto& i : hmap) {...}
+ * \endcode
+ */
+
 #include "allocator.h"
 #include "hash.h"
 
@@ -9,6 +28,11 @@ namespace sc
     template <>
     constexpr inline uint32_t DEFVAL<uint32_t> = 0xffffffffU;
 
+    /**
+     * Hashmap with open addressing, Robin Hood reordering scheme, backward shift deleteion
+     * \tparam K key's type.
+     * \tparam V value's type.
+     */
     template <typename K, typename V>
     class hashmap
     {
@@ -80,10 +104,31 @@ namespace sc
         using iter = kv_iter;
 
     public:
+        /**
+	 * Sets allocator.
+	 */
         constexpr hashmap(allocator& default_alloc);
+
+        /**
+	 * Destroys map, sets size and capacity to 0.
+	 */
         ~hashmap();
+
+        /**
+	 * Allocates array of key-value pairs with a given @param capacity.
+	 */
         constexpr void init(size_t capacity);
+
+        /**
+	 * Puts key & value.
+	 * @return true on success.
+	 */
         constexpr bool put(const K& key, const V& value);
+
+        /**
+	 * Gets value by key.
+	 * @return default constructed value on fail.
+	 */
         constexpr V get(const K& key) const;
         constexpr void remove(const K& key);
         constexpr uint32_t len() const;
@@ -140,14 +185,16 @@ namespace sc
 
         for(uint32_t i = 0, current_index = init_index; i < capacity;
             ++i, current_index = (init_index + i) % capacity) {
-
+            // if slot is empty
             if(kvps[current_index].key == DEFVAL<K>) {
                 kvps[current_index] = to_insert;
                 ++size;
                 return true;
+                // if key is already inserted
             } else if(kvps[current_index].key == to_insert.key) {
                 sc::swap(to_insert, kvps[current_index]);
                 return true;
+                // if DIB of value to insert is greater
             } else if(kvps[current_index].dib < to_insert.dib) {
                 sc::swap(to_insert, kvps[current_index]);
             }
