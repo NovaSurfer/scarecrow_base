@@ -2,31 +2,7 @@
 // Created by novasurfer on 10/21/20.
 //
 
-#if defined(__GNUC__)
-#    define SC_COMPILER_GCC 1
-#endif
-
-#if defined(__clang__)
-#    define SC_COMPILER_CLANG 1
-#endif
-
-#if defined(_MSC_VER)
-#    define SC_COMPILER_MVC 1
-#endif
-
-#ifdef SC_COMPILER_MVC
-#    define sc_forceinline __forceinline
-#elif defined(SC_COMPILER_GCC)
-#    define sc_forceinline inline __attribute__((__always_inline__))
-#elif defined(SC_COMPILER_CLANG)
-#    if __has_attribute(__always_inline__)
-#        define forceinline inline __attribute__((__always_inline__))
-#    else
-#        define sc_forceinline inline
-#    endif
-#else
-#    define sc_forceinline inline
-#endif
+#include "compiler.h"
 
 #if SC_COMPILER_GCC || SC_COMPILER_CLANG
 #    include <cstdlib>
