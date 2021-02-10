@@ -1,6 +1,7 @@
 set(TEST_SOURCES
     unit.cpp
     doctest/doctest.h
+    ../compiler.h
     ../memory.h
     ../memory.cpp
     ../allocator.h
@@ -17,8 +18,9 @@ set(TEST_SOURCES
     ../MurmurHash3.cpp
     ../hash.h
     ../hashmap.h
-
-
+    ../futex.h
+    ../mutex.h
+    ../mutex.cpp
     vec_test.cpp
     hashmap_test.cpp
     )
