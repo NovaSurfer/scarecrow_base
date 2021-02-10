@@ -26,7 +26,7 @@ template <typename T>
 constexpr static T atomic_decrement(T* val)
 {
 #if defined(SC_COMPILER_GCC_OR_CLANG)
-    return __sync_add_and_fetch(val, -1);
+    return __sync_sub_and_fetch(val, 1);
 #elif defined(SC_COMPILER_MVC)
     return _InterlockedDecrement(val);
 #endif
