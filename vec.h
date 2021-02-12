@@ -62,8 +62,8 @@ namespace sc
     {
         data = static_cast<T*>(alloc->allocate(sizeof(T) * space, alignof(T)));
         if constexpr(!is_trivial_v<T>) {
-            data[0] = T();
-            data[1] = T();
+            new(data) T();
+            new(data + 1) T();
         }
     }
 
@@ -76,7 +76,7 @@ namespace sc
         data = static_cast<T*>(alloc->allocate(sizeof(T) * space, alignof(T)));
         if constexpr(!is_trivial_v<T>) {
             for(size_t i = 0; i < space; ++i) {
-                data[i] = T();
+                new(data + i) T();
             }
         }
     }
@@ -88,8 +88,8 @@ namespace sc
         , space(len)
     {
         data = static_cast<T*>(alloc->allocate(sizeof(T) * space, alignof(T)));
-        for(size_t i = 0; i < sz; ++i) {
-            new(static_cast<void*>(data + i)) T(item);
+        for(size_t i = 0; i < space; ++i) {
+            new(data + i) T(item);
         }
     }
 
@@ -101,7 +101,7 @@ namespace sc
     {
         data = static_cast<T*>(alloc->allocate(sizeof(T) * space, alignof(T)));
         for(size_t i = 0; i < sz; ++i) {
-            new(static_cast<void*>(data + i)) T(other.data[i]);
+            new(data + i) T(other.data[i]);
         }
     }
 
@@ -116,41 +116,54 @@ namespace sc
     template <typename T>
     vec<T>::~vec()
     {
-        /*
+
         if constexpr(!is_trivial_v<T>) {
-            for(size_t i = 0; i < sz; ++i) {
+            for(size_t i = 0; i < space; ++i) {
                 data[i].~T();
             }
-	    }*/
+        }
 
         alloc->deallocate(data);
         data = nullptr;
         sz = 0;
         space = 0;
     }
+
     /*
     template <typename T>
-    constexpr vec<T>& vec<T>::operator=(const vec<T>& v)
+    constexpr vec<T>& vec<T>::operator=(const vec<T>& o)
     {
         // check for self-assignment?
 
-        // WARN: ALLOCATOR NOT COPIED
-        //alloc = v.alloc;
+        // if alloc differs
+        if(alloc != o.alloc) {
+            // clean data
+            if constexpr(!is_trivial_v<T>) {
+                for(size_t i = 0; i < space; ++i) {
+                    data[i].~T();
+                }
+            }
+            alloc->deallocate(data);
 
-        if(v.sz > space) {
-            this->~vec<T>();
-            data = static_cast<T*>(alloc->allocate(sizeof(T) * v.space, alignof(T)));
-            space = v.sz;
-        }
+            // copy alloc
+            alloc = o.alloc;
 
-        for(size_t i = 0; i < v.sz; ++i) {
-            data[i] = v[i];
-        }
+            // allocate new space using new alloc
+            data = static_cast<T*>(alloc->allocate(sizeof(T) * o.space, alignof(T)));
 
-        sz = v.sz;
+            // copy data
+            for(size_t i = 0; i < o.sz; ++i) {
+                data[i] = o.data[i];
+            }
+
+            space = o.space;
+            sz = o.sz;
+        } else {
+	...
+	}
+
         return *this;
     }
-
     template <typename T>
     constexpr vec<T>& vec<T>::operator=(vec<T>&& v)
     {
@@ -179,11 +192,11 @@ namespace sc
     {
         if(capacity > space) {
 
-            T* new_data = (T*)alloc->allocate(sizeof(T) * capacity, alignof(T));
+            T* new_data = static_cast<T*>(alloc->allocate(sizeof(T) * capacity, alignof(T)));
 
             // WARN: UB if T() ctor throw
             for(size_t i = 0; i < sz; ++i) {
-                new(static_cast<void*>(new_data + i)) T(data[i]);
+                new(new_data + i) T(data[i]);
             }
 
             alloc->deallocate(data);

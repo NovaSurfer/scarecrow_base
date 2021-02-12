@@ -6,6 +6,7 @@
 #include "../linear_alloc.h"
 #include "../vec.h"
 #include "doctest/doctest.h"
+#include <algorithm>
 #include <cstdlib>
 
 sc::heap_alloc halloc;
@@ -196,7 +197,7 @@ struct NonPod
 
     NonPod()
         : val(88.8)
-        , bytes(nullptr)
+        , bytes((char*)malloc(256))
 
     {
         MESSAGE("default ctr");
@@ -204,21 +205,39 @@ struct NonPod
 
     NonPod(double dval)
         : val(dval)
+	, bytes((char*)malloc(256))
     {
         MESSAGE("ctr");
-        bytes = (char*)malloc(256);
     }
 
     NonPod(const NonPod& o)
         : val(o.val)
+        , bytes((char*)malloc(256))
     {
         MESSAGE("copy ctr");
+        std::copy(o.bytes, o.bytes + 256, bytes);
+    }
+
+    NonPod& operator=(const NonPod& o)
+    {
+        MESSAGE("assignment operator");
+        if(this == &o)
+            return *this;
+        free(bytes);
+        bytes = nullptr;
+        val = 0;
+
+        bytes = (char*)malloc(256);
+        val = o.val;
+        std::copy(o.bytes, o.bytes + 256, bytes);
+        return *this;
     }
 
     //NonPod(NonPod&&) = default;
 
     ~NonPod()
     {
+        MESSAGE("dstr");
         free(bytes);
         bytes = nullptr;
     }
@@ -253,7 +272,7 @@ TEST_CASE("vector-operations-non-pods")
 
     SUBCASE("constructor with size, filled with some value")
     {
-        const NonPod value {5.799};
+        const NonPod& value = 5.799;
         sc::vec<NonPod> v(lalloc2, 4, value);
         CHECK(v[0].val == 5.799);
         CHECK(v[1].val == 5.799);
@@ -261,6 +280,7 @@ TEST_CASE("vector-operations-non-pods")
         CHECK(v[3].val == 5.799);
         CHECK(v.capacity() == 4);
     }
+
 
     SUBCASE("constructor with ref to other vector")
     {
@@ -320,7 +340,7 @@ TEST_CASE("vector-operations-non-pods")
         CHECK(v2[4].val == 1.99);
     }
     */
-
+    /*
     SUBCASE("size()")
     {
         const NonPod value {1.1};
@@ -424,4 +444,5 @@ TEST_CASE("vector-operations-non-pods")
         v.pop_back();
         CHECK(v[v.size() - 1].val == v[2].val);
     }
+    */
 }
