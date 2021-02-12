@@ -58,6 +58,7 @@ set(SC_MEM_SRC
     temp_alloc.cpp
     pool_alloc.h
     pool_alloc.cpp
+    arr.h
     vec.h
     MurmurHash3.h
     MurmurHash3.cpp
