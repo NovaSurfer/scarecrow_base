@@ -25,13 +25,14 @@ namespace sc
         ~vec();
 
         // TODO:
-        constexpr vec<T>& operator=(const vec<T>& v) = delete;
-        constexpr vec<T>& operator=(vec<T>&& v) = delete;
+        constexpr vec<T>& operator=(const vec<T>& v);
+        constexpr vec<T>& operator=(vec<T>&& v);
 
         void reserve(size_t capacity);
         void resize(size_t new_size);
         void shrink_to_fit();
         void pop_back();
+        void clear();
 
         void push(const T& item);
         template <typename... Args>
@@ -52,20 +53,18 @@ namespace sc
         allocator* alloc;
         size_t sz;
         size_t space;
+
+        constexpr static size_t GROWTH_FACTOR = 2;
+        constexpr static size_t MIN_CAPACITY = 8;
     };
 
     template <typename T>
     constexpr vec<T>::vec(allocator& alc)
-        : alloc(&alc)
+        : data(nullptr)
+        , alloc(&alc)
         , sz(0)
-        , space(2)
-    {
-        data = static_cast<T*>(alloc->allocate(sizeof(T) * space, alignof(T)));
-        if constexpr(!is_trivial_v<T>) {
-            new(data) T();
-            new(data + 1) T();
-        }
-    }
+        , space(0)
+    {}
 
     template <typename T>
     constexpr vec<T>::vec(allocator& alc, size_t len)
@@ -116,76 +115,42 @@ namespace sc
     template <typename T>
     vec<T>::~vec()
     {
-
-        if constexpr(!is_trivial_v<T>) {
-            for(size_t i = 0; i < space; ++i) {
-                data[i].~T();
-            }
-        }
-
-        alloc->deallocate(data);
-        data = nullptr;
-        sz = 0;
-        space = 0;
+        clear();
     }
 
-    /*
     template <typename T>
     constexpr vec<T>& vec<T>::operator=(const vec<T>& o)
     {
-        // check for self-assignment?
-
-        // if alloc differs
-        if(alloc != o.alloc) {
-            // clean data
-            if constexpr(!is_trivial_v<T>) {
-                for(size_t i = 0; i < space; ++i) {
-                    data[i].~T();
-                }
+        if(this != &o) {
+            // if alloc differs
+            clear();
+            if(alloc != o.alloc) {
+                alloc = o.alloc;
             }
-            alloc->deallocate(data);
-
-            // copy alloc
-            alloc = o.alloc;
-
-            // allocate new space using new alloc
             data = static_cast<T*>(alloc->allocate(sizeof(T) * o.space, alignof(T)));
-
-            // copy data
             for(size_t i = 0; i < o.sz; ++i) {
                 data[i] = o.data[i];
             }
-
             space = o.space;
             sz = o.sz;
-        } else {
-	...
-	}
+        }
 
         return *this;
     }
+
     template <typename T>
-    constexpr vec<T>& vec<T>::operator=(vec<T>&& v)
+    constexpr vec<T>& vec<T>::operator=(vec<T>&& o)
     {
-        // check for self-assignment?
+        clear();
+        space = o.space;
+        sz = o.sz;
+        alloc = o.alloc;
+        data = o.data;
+        o.data = nullptr;
+        o.sz = o.space = 0;
 
-        // WARN: ALLOCATOR NOT COPIED
-        //alloc = v.alloc;
-
-        if(v.sz > space) {
-            this->~vec<T>();
-            data = static_cast<T*>(alloc->allocate(sizeof(T) * v.sz, alignof(T)));
-            space = move(v.sz);
-        }
-
-        for(size_t i = 0; i < v.sz; ++i) {
-            data[i] = move(v[i]);
-        }
-
-        sz = move(v.sz);
         return *this;
     }
-    */
 
     template <typename T>
     void vec<T>::reserve(size_t capacity)
@@ -194,12 +159,20 @@ namespace sc
 
             T* new_data = static_cast<T*>(alloc->allocate(sizeof(T) * capacity, alignof(T)));
 
-            // WARN: UB if T() ctor throw
-            for(size_t i = 0; i < sz; ++i) {
-                new(new_data + i) T(data[i]);
+            if(data) {
+                for(size_t i = 0; i < sz; ++i) {
+                    new(new_data + i) T(data[i]);
+                }
+
+                if constexpr(!is_trivial_v<T>) {
+                    for(size_t i = 0; i < sz; ++i) {
+                        data[i].~T();
+                    }
+                }
+
+                alloc->deallocate(data);
             }
 
-            alloc->deallocate(data);
             data = new_data;
             space = capacity;
         }
@@ -209,25 +182,19 @@ namespace sc
     void vec<T>::resize(size_t new_size)
     {
         if(new_size > sz) {
-            if(new_size > space) {
-                reserve(new_size);
-            }
-
+            reserve(new_size);
             if constexpr(!is_trivial_v<T>) {
-                for(size_t i = sz; i != new_size; ++i) {
-                    data[i] = T();
+                for(size_t i = sz; i < new_size; ++i) {
+                    new(data + i) T();
                 }
             }
 
-        } else if(sz > new_size) {
-            // if T is non-POD
-
-            /*
+        } else {
             if constexpr(!is_trivial_v<T>) {
-                for(size_t i = sz; i != new_size; --i) {
+                for(size_t i = new_size; i < sz; ++i) {
                     data[i].~T();
                 }
-		}*/
+            }
         }
 
         sz = new_size;
@@ -239,16 +206,19 @@ namespace sc
         if(space > sz) {
             T* new_data = (T*)alloc->allocate(sizeof(T) * sz, alignof(T));
 
-            for(size_t i = 0; i < sz; ++i) {
-                new_data[i] = data[i];
-            }
-
-            /*
             if constexpr(!is_trivial_v<T>) {
+                for(size_t i = 0; i < sz; ++i) {
+                    new(new_data + i) T(data[i]);
+                }
+
                 for(size_t i = 0; i < sz; ++i) {
                     data[i].~T();
                 }
-		}*/
+            } else {
+                for(size_t i = 0; i < sz; ++i) {
+                    new_data[i] = data[i];
+                }
+            }
 
             alloc->deallocate(data);
 
@@ -260,17 +230,33 @@ namespace sc
     template <typename T>
     void vec<T>::pop_back()
     {
-        //data[sz].~T();
         --sz;
+        if constexpr(!is_trivial_v<T>) {
+            data[sz].~T();
+        }
+    }
+
+    template <typename T>
+    void vec<T>::clear()
+    {
+        if constexpr(!is_trivial_v<T>) {
+            for(size_t i = 0; i < sz; ++i) {
+                data[i].~T();
+            }
+        }
+
+        alloc->deallocate(data);
+        sz = space = 0;
     }
 
     template <typename T>
     void vec<T>::push(const T& item)
     {
         if(!space) {
-            reserve(8);
+            // TODO: test that branch
+            reserve(vec::MIN_CAPACITY);
         } else if(sz == space) {
-            reserve(space * 2);
+            reserve(space * vec::GROWTH_FACTOR);
         }
 
         data[sz] = item;
@@ -282,9 +268,9 @@ namespace sc
     void vec<T>::emplace(Args&&... args)
     {
         if(!space) {
-            reserve(8);
+            reserve(vec::MIN_CAPACITY);
         } else if(sz == space) {
-            reserve(space * 2);
+            reserve(space * vec::GROWTH_FACTOR);
         }
 
         data[sz] = T(forward<Args>(args)...);
