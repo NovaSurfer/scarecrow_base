@@ -8,6 +8,7 @@
 #include "doctest/doctest.h"
 #include <algorithm>
 #include <cstdlib>
+#include <vector>
 
 sc::heap_alloc halloc;
 sc::linear_alloc lalloc(halloc, sizeof(double) * 256, alignof(double));
@@ -18,7 +19,7 @@ TEST_CASE("vector-operations-pods")
     SUBCASE("default constructor")
     {
         sc::vec<double> v(lalloc);
-        CHECK(v.capacity() == 2);
+        CHECK(v.capacity() == 0);
     }
 
     SUBCASE("constructor with size")
@@ -63,7 +64,6 @@ TEST_CASE("vector-operations-pods")
         CHECK(v2[4] == 1.99);
     }
 
-    /*
     SUBCASE("copy assignment operator")
     {
         sc::vec<double> v(lalloc, 5, 1.99);
@@ -79,8 +79,8 @@ TEST_CASE("vector-operations-pods")
 
     SUBCASE("move assignment operator")
     {
-        sc::vec<double> v(palloc, 5, 1.99);
-        sc::vec<double> v2(palloc, 2, 5.0);
+        sc::vec<double> v(lalloc, 5, 1.99);
+        sc::vec<double> v2(lalloc, 2, 5.0);
         v2 = sc::move(v);
         CHECK(v2.capacity() == 5);
         CHECK(v2[0] == 1.99);
@@ -89,7 +89,6 @@ TEST_CASE("vector-operations-pods")
         CHECK(v2[3] == 1.99);
         CHECK(v2[4] == 1.99);
     }
-    */
 
     SUBCASE("size()")
     {
@@ -205,7 +204,7 @@ struct NonPod
 
     NonPod(double dval)
         : val(dval)
-	, bytes((char*)malloc(256))
+        , bytes((char*)malloc(256))
     {
         MESSAGE("ctr");
     }
@@ -221,15 +220,14 @@ struct NonPod
     NonPod& operator=(const NonPod& o)
     {
         MESSAGE("assignment operator");
-        if(this == &o)
-            return *this;
-        free(bytes);
-        bytes = nullptr;
-        val = 0;
+        if(this != &o) {
+	    // free(bytes);
+            // bytes = nullptr;
 
-        bytes = (char*)malloc(256);
-        val = o.val;
-        std::copy(o.bytes, o.bytes + 256, bytes);
+            bytes = (char*)malloc(256);
+            val = o.val;
+            std::copy(o.bytes, o.bytes + 256, bytes);
+        }
         return *this;
     }
 
@@ -255,9 +253,7 @@ TEST_CASE("vector-operations-non-pods")
     SUBCASE("default constructor")
     {
         sc::vec<NonPod> v(lalloc2);
-        CHECK(v[0].val == 88.8);
-        CHECK(v[1].val == 88.8);
-        CHECK(v.capacity() == 2);
+        CHECK(v.capacity() == 0);
     }
 
     SUBCASE("constructor with size")
@@ -280,7 +276,6 @@ TEST_CASE("vector-operations-non-pods")
         CHECK(v[3].val == 5.799);
         CHECK(v.capacity() == 4);
     }
-
 
     SUBCASE("constructor with ref to other vector")
     {
@@ -308,7 +303,6 @@ TEST_CASE("vector-operations-non-pods")
         CHECK(v2[4].val == 1.99);
     }
 
-    /*
     SUBCASE("copy assignment operator")
     {
 
@@ -339,8 +333,7 @@ TEST_CASE("vector-operations-non-pods")
         CHECK(v2[3].val == 1.99);
         CHECK(v2[4].val == 1.99);
     }
-    */
-    /*
+
     SUBCASE("size()")
     {
         const NonPod value {1.1};
@@ -352,6 +345,7 @@ TEST_CASE("vector-operations-non-pods")
         CHECK(v.size() == 3);
         CHECK(v.capacity() == 4);
     }
+
 
     SUBCASE("resize()")
     {
@@ -365,6 +359,7 @@ TEST_CASE("vector-operations-non-pods")
         v.resize(5);
 
         CHECK(v.size() == 5);
+	CHECK(v.capacity() == 5);
         CHECK(v[0].val == 1.1);
         CHECK(v[1].val == 2.2);
         CHECK(v[2].val == 3.3);
@@ -377,6 +372,8 @@ TEST_CASE("vector-operations-non-pods")
 
         // Decreasing size
         v.resize(2);
+	CHECK(v.size() == 2);
+	CHECK(v.capacity() == 10);
         CHECK(v[0].val == 1.1);
         CHECK(v[1].val == 2.2);
     }
@@ -407,7 +404,7 @@ TEST_CASE("vector-operations-non-pods")
     SUBCASE("raw()")
     {
         sc::vec<NonPod> v(halloc2, 1, NonPod(1.1));
-        CHECK(v[0].val == v.raw()->val);
+        CHECK(v[0].bytes == v.raw()->bytes);
     }
 
     SUBCASE("push_back()")
@@ -444,5 +441,4 @@ TEST_CASE("vector-operations-non-pods")
         v.pop_back();
         CHECK(v[v.size() - 1].val == v[2].val);
     }
-    */
 }
