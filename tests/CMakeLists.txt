@@ -15,6 +15,7 @@ set(TEST_SOURCES
     ../pool_alloc.cpp
     ../arr.h
     ../vec.h
+    ../queue.h
     ../MurmurHash3.h
     ../MurmurHash3.cpp
     ../hash.h
@@ -24,6 +25,7 @@ set(TEST_SOURCES
     ../mutex.cpp
     vec_test.cpp
     hashmap_test.cpp
+    arr_test.cpp
     )
 
 add_executable(sc_base_test ${TEST_SOURCES})

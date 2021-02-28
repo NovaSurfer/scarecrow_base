@@ -60,6 +60,7 @@ set(SC_MEM_SRC
     pool_alloc.cpp
     arr.h
     vec.h
+    queue.h
     MurmurHash3.h
     MurmurHash3.cpp
     hash.h
