@@ -177,7 +177,6 @@ TEST_CASE("vector-operations-pods")
         CHECK(v[2] == 3.1);
     }
 
-    /*
     SUBCASE("pop_back()")
     {
         sc::vec<double> v(halloc, 1, 1.1);
@@ -187,7 +186,6 @@ TEST_CASE("vector-operations-pods")
         v.pop_back();
         CHECK(v[v.size() - 1] == v[2]);
     }
-    */
 }
 
 /*************** non-pod types ***************/
@@ -221,7 +219,7 @@ struct NonPod
     {
         MESSAGE("assignment operator");
         if(this != &o) {
-	    // free(bytes);
+            // free(bytes);
             // bytes = nullptr;
 
             bytes = (char*)malloc(256);
@@ -346,7 +344,6 @@ TEST_CASE("vector-operations-non-pods")
         CHECK(v.capacity() == 4);
     }
 
-
     SUBCASE("resize()")
     {
         const NonPod value {1.1};
@@ -359,7 +356,7 @@ TEST_CASE("vector-operations-non-pods")
         v.resize(5);
 
         CHECK(v.size() == 5);
-	CHECK(v.capacity() == 5);
+        CHECK(v.capacity() == 5);
         CHECK(v[0].val == 1.1);
         CHECK(v[1].val == 2.2);
         CHECK(v[2].val == 3.3);
@@ -372,8 +369,8 @@ TEST_CASE("vector-operations-non-pods")
 
         // Decreasing size
         v.resize(2);
-	CHECK(v.size() == 2);
-	CHECK(v.capacity() == 10);
+        CHECK(v.size() == 2);
+        CHECK(v.capacity() == 10);
         CHECK(v[0].val == 1.1);
         CHECK(v[1].val == 2.2);
     }
