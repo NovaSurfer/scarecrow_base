@@ -26,6 +26,7 @@ set(TEST_SOURCES
     vec_test.cpp
     hashmap_test.cpp
     arr_test.cpp
+    queue_test.cpp
     )
 
 add_executable(sc_base_test ${TEST_SOURCES})
