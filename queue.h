@@ -13,6 +13,7 @@ namespace sc
         constexpr queue(allocator& alloc);
         constexpr void push(const T& val);
         constexpr T pop();
+        constexpr size_t len() const;
 
     private:
         vec<T> arr;
@@ -38,6 +39,12 @@ namespace sc
         out = (out + 1) % arr.size();
         arr.pop_back();
         return val;
+    }
+
+    template <typename T>
+    constexpr size_t queue<T>::len() const
+    {
+        return arr.size();
     }
 
 }
