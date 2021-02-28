@@ -90,26 +90,26 @@ TEST_CASE("vector-operations-pods")
         CHECK(v2[4] == 1.99);
     }
 
-    SUBCASE("size()")
+    SUBCASE("len()")
     {
         sc::vec<double> v(lalloc, 1, 1.1);
         v.push(2.2);
         v.push(3.3);
-        CHECK(v.size() == 3);
+        CHECK(v.len() == 3);
         CHECK(v.capacity() == 4);
     }
 
-    SUBCASE("resize()")
+    SUBCASE("relen()")
     {
         sc::vec<double> v(lalloc, 1, 1.1);
         v.push(2.2);
         v.push(3.3);
-        CHECK(v.size() == 3);
+        CHECK(v.len() == 3);
 
         // Increasing size
         v.resize(5);
 
-        CHECK(v.size() == 5);
+        CHECK(v.len() == 5);
         CHECK(v[0] == 1.1);
         CHECK(v[1] == 2.2);
         CHECK(v[2] == 3.3);
@@ -118,7 +118,7 @@ TEST_CASE("vector-operations-pods")
         v.push(5.5);
         v.push(6.6);
 
-        CHECK(v.size() == 8);
+        CHECK(v.len() == 8);
 
         // Decreasing size
         v.resize(2);
@@ -130,7 +130,7 @@ TEST_CASE("vector-operations-pods")
     {
         sc::vec<double> v(halloc, 1, 1.1);
         v.reserve(5);
-        CHECK(v.size() == 1);
+        CHECK(v.len() == 1);
         CHECK(v.capacity() == 5);
     }
 
@@ -139,11 +139,11 @@ TEST_CASE("vector-operations-pods")
         sc::vec<double> v(halloc, 1, 1.1);
         v.push(2.2);
         v.push(3.3);
-        CHECK(v.size() == 3);
+        CHECK(v.len() == 3);
         CHECK(v.capacity() == 4);
         v.shrink_to_fit();
 
-        CHECK(v.size() == 3);
+        CHECK(v.len() == 3);
         CHECK(v.capacity() == 3);
     }
 
@@ -184,7 +184,7 @@ TEST_CASE("vector-operations-pods")
         v.push(3.3);
         v.push(4.4);
         v.pop_back();
-        CHECK(v[v.size() - 1] == v[2]);
+        CHECK(v[v.len() - 1] == v[2]);
     }
 }
 
@@ -332,7 +332,7 @@ TEST_CASE("vector-operations-non-pods")
         CHECK(v2[4].val == 1.99);
     }
 
-    SUBCASE("size()")
+    SUBCASE("len()")
     {
         const NonPod value {1.1};
         NonPod value2 {2.2};
@@ -340,22 +340,22 @@ TEST_CASE("vector-operations-non-pods")
         sc::vec<NonPod> v(lalloc2, 1, value);
         v.push(value2);
         v.push(value3);
-        CHECK(v.size() == 3);
+        CHECK(v.len() == 3);
         CHECK(v.capacity() == 4);
     }
 
-    SUBCASE("resize()")
+    SUBCASE("relen()")
     {
         const NonPod value {1.1};
         sc::vec<NonPod> v(lalloc2, 1, value);
         v.push(2.2);
         v.push(3.3);
-        CHECK(v.size() == 3);
+        CHECK(v.len() == 3);
 
         // Increasing size
         v.resize(5);
 
-        CHECK(v.size() == 5);
+        CHECK(v.len() == 5);
         CHECK(v.capacity() == 5);
         CHECK(v[0].val == 1.1);
         CHECK(v[1].val == 2.2);
@@ -365,11 +365,11 @@ TEST_CASE("vector-operations-non-pods")
         v.push(5.5);
         v.push(6.6);
 
-        CHECK(v.size() == 8);
+        CHECK(v.len() == 8);
 
         // Decreasing size
         v.resize(2);
-        CHECK(v.size() == 2);
+        CHECK(v.len() == 2);
         CHECK(v.capacity() == 10);
         CHECK(v[0].val == 1.1);
         CHECK(v[1].val == 2.2);
@@ -380,7 +380,7 @@ TEST_CASE("vector-operations-non-pods")
         const NonPod value {1.1};
         sc::vec<NonPod> v(halloc2, 1, value);
         v.reserve(5);
-        CHECK(v.size() == 1);
+        CHECK(v.len() == 1);
         CHECK(v.capacity() == 5);
     }
 
@@ -390,11 +390,11 @@ TEST_CASE("vector-operations-non-pods")
         sc::vec<NonPod> v(halloc2, 1, value);
         v.push(2.2);
         v.push(3.3);
-        CHECK(v.size() == 3);
+        CHECK(v.len() == 3);
         CHECK(v.capacity() == 4);
         v.shrink_to_fit();
 
-        CHECK(v.size() == 3);
+        CHECK(v.len() == 3);
         CHECK(v.capacity() == 3);
     }
 
@@ -436,6 +436,6 @@ TEST_CASE("vector-operations-non-pods")
         v.push(3.3);
         v.push(4.4);
         v.pop_back();
-        CHECK(v[v.size() - 1].val == v[2].val);
+        CHECK(v[v.len() - 1].val == v[2].val);
     }
 }

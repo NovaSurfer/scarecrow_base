@@ -36,7 +36,7 @@ namespace sc
     constexpr T queue<T>::pop()
     {
         T val = arr[out];
-        out = (out + 1) % arr.size();
+        out = (out + 1) % arr.len();
         arr.pop_back();
         return val;
     }
@@ -44,7 +44,7 @@ namespace sc
     template <typename T>
     constexpr size_t queue<T>::len() const
     {
-        return arr.size();
+        return arr.len();
     }
 
 }
