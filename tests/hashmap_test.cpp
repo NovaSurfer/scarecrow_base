@@ -49,7 +49,7 @@ TEST_CASE("hash")
 }
 
 sc::heap_alloc halloc3;
-sc::linear_alloc lalloc3(halloc3, sizeof(Pod) * 256, alignof(Pod));
+sc::linear_alloc lalloc3(halloc3, sizeof(Pod) * 512, alignof(Pod));
 
 TEST_CASE("hashmap-stress")
 {
