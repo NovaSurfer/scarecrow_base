@@ -70,8 +70,8 @@ set(SC_MEM_SRC
     mutex.cpp
     test.cpp)
 
-add_executable(sc_memory_test ${SC_MEM_SRC})
-target_include_directories(sc_memory_test PUBLIC ${CMAKE_SOURCE_DIR})
+add_executable(${PROJECT_NAME} ${SC_MEM_SRC})
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR})
 if(WINSDKSYNC_FOUND)
 	target_link_libraries(${PROJECT_NAME} ${winsdk_sync_lib})
 endif()

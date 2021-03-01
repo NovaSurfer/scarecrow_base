@@ -31,3 +31,7 @@ set(TEST_SOURCES
 
 add_executable(sc_base_test ${TEST_SOURCES})
 target_include_directories(sc_base_test PUBLIC ${CMAKE_SOURCE_DIR})
+if(WINSDKSYNC_FOUND)
+	target_link_libraries(sc_base_test ${winsdk_sync_lib})
+endif()
+
