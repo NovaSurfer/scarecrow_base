@@ -1,5 +1,4 @@
 #include "MurmurHash3.h"
-#include <bits/stdint-uintn.h>
 #include <cstdint>
 #include <cstring>
 
@@ -10,7 +9,7 @@ namespace sc
     uint32_t hash(uint32_t key)
     {
         uint32_t result[1];
-	const uint32_t* ptr = &key;
+	    const uint32_t* ptr = &key;
         MurmurHash3_x86_32(ptr, sizeof(uint32_t), HASH_SEED, result);
         return *result;
     }
