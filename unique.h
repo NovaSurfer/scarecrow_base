@@ -99,6 +99,12 @@ namespace sc
     {
         return a.get() != nullptr;
     }
+
+    template<typename T, typename... Args>
+    sc_forceinline unique<T> make_unique(Args&&... args)
+    {
+        return unique<T>(new T(sc::forward<Args>(args)...));
+    }
 }
 
 #endif //SC_BASE_UNIQUE_H
