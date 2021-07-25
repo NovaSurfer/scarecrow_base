@@ -46,7 +46,7 @@ endif()
 add_definitions("-DSC_ALLOC_WITH_HEADER")
 
 set(SC_MEM_SRC
-    compiler.h
+	compiler.h
     memory.h
     memory.cpp
     allocator.h
@@ -68,6 +68,11 @@ set(SC_MEM_SRC
     futex.h
     mutex.h
     mutex.cpp
+#    thread.h
+#    thread.cpp
+	typeutils.h
+	smart_ptr.h
+    unique.h
     test.cpp)
 
 add_executable(${PROJECT_NAME} ${SC_MEM_SRC})

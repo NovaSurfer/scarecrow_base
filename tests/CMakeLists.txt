@@ -1,7 +1,12 @@
+cmake_minimum_required(VERSION 3.10)
+
+
+project(sc_base_test)
+
 set(TEST_SOURCES
     unit.cpp
     doctest/doctest.h
-    ../compiler.h
+	../compiler.h
     ../memory.h
     ../memory.cpp
     ../allocator.h
@@ -23,10 +28,16 @@ set(TEST_SOURCES
     ../futex.h
     ../mutex.h
     ../mutex.cpp
+#    ../thread.h
+#    ../thread.cpp
+	../typeutils.h
+	../smart_ptr.h
+    ../unique.h
     vec_test.cpp
     hashmap_test.cpp
     arr_test.cpp
     queue_test.cpp
+	unique_test.cpp
     )
 
 add_executable(sc_base_test ${TEST_SOURCES})
