@@ -9,13 +9,23 @@
 #    define SC_OS_LINUX 1
 #endif
 
-#if defined(__APPLE__)
-#    define SC_OS_APPLE 1
+#if defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__)
+#    define SC_OS_OSX 1
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
 #    define SC_OS_WINDOWS 1
 #endif
+
+#if defined(__ANDROID__)
+#define SC_OS_ANDROID 1
+#endif
+
+#if defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__)
+#define SC_OS_IOS 1
+#endif
+
+#define SC_OS_POSIX (SC_OS_LINUX || SC_OS_OSX || SC_OS_ANDROID || SC_OS_IOS)
 
 #if defined(__GNUC__)
 #    define SC_COMPILER_GCC 1
