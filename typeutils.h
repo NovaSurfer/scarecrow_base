@@ -24,7 +24,7 @@ namespace sc
      * Determine whether T is a pointer
      */
     template <typename>
-    inline constexpr bool is_pointer_v = false; 
+    inline constexpr bool is_pointer_v = false;
 
     template <typename T>
     inline constexpr bool is_pointer_v<T*> = true;
@@ -37,6 +37,12 @@ namespace sc
 
     template <typename T>
     inline constexpr bool is_pointer_v<T* const volatile> = true;
+
+    template<bool B, typename T, typename F>
+    struct conditional { typedef T type; };
+
+    template<typename T, typename F>
+    struct conditional<false, T, F> { typedef F type; };
 
     /**
      * Remove reference
@@ -101,6 +107,32 @@ namespace sc
         t1 = move(t2);
         t2 = move(temp);
     }
+
+
+    template <typename Base, typename Member>
+    class compressed_pair : private Base
+    {
+    public:
+        constexpr compressed_pair() = default;
+
+        compressed_pair(const Base& b, const Member& m)
+            : Base(b)
+            , member(m)
+        { }
+
+        Base& first()
+        {
+            return static_cast<Base&>(*this);
+        }
+
+        Member& second()
+        {
+            return this->member;
+        }
+
+    private:
+        Member member;
+    };
 
 }
 
