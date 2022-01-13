@@ -5,8 +5,6 @@
 #include "typeutils.h"
 #include "compiler.h"
 
-struct allocator;
-
 namespace sc
 {
 
