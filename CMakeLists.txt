@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 project(sc_memory)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -57,7 +57,7 @@ set(SC_MEM_SRC
         temp_alloc.h
         temp_alloc.cpp
         pool_alloc.h
-        pool_alloc.cpp
+        pool_alloc.cpp #TODO: fix SEGFAULT
         arr.h
         vec.h
         queue.h
@@ -69,12 +69,12 @@ set(SC_MEM_SRC
         futex.h
         mutex.h
         mutex.cpp
-        #    thread.h
-        #    thread.cpp
+#        thread.h TODO: implement
+#        thread.cpp TODO: implement
         typeutils.h
         smart_ptr.h
-        unique.h
-        shared.h
+        unique.h #TODO: add unit tests
+        shared.h #TODO: implement, add unit tests
         event_queue.h
         event_queue.inl
         sc_types.h
