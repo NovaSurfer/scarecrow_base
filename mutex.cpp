@@ -1,5 +1,6 @@
 #include "mutex.h"
 #include "futex.h"
+#include "atomic_utils.h"
 
 namespace sc
 {

@@ -22,16 +22,6 @@ constexpr static T cmp_n_swap(T* ptr, T old, T fresh)
 #endif
 }
 
-template <typename T>
-constexpr static T atomic_decrement(T* val)
-{
-#if defined(SC_COMPILER_GCC_OR_CLANG)
-    return __sync_sub_and_fetch(val, 1);
-#elif defined(SC_COMPILER_MVC)
-    return _InterlockedDecrement(val);
-#endif
-}
-
 namespace sc
 {
 
