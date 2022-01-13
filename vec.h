@@ -7,6 +7,7 @@
 
 #include "typeutils.h"
 #include <cstddef>
+#include <cstring>
 
 struct allocator;
 
@@ -37,6 +38,7 @@ namespace sc
         void push(const T& item);
         template <typename... Args>
         void emplace(Args&&... args);
+        void insert_at(T* item, size_t index, size_t count);
 
         constexpr T* raw() noexcept;
         constexpr const T* raw() const noexcept;
@@ -64,7 +66,7 @@ namespace sc
         , alloc(&alc)
         , size(0)
         , space(0)
-    {}
+    { }
 
     template <typename T>
     constexpr vec<T>::vec(allocator& alc, size_t len)
@@ -110,7 +112,7 @@ namespace sc
         , size(move(other.size))
         , space(move(other.space))
         , data(move(other.data))
-    {}
+    { }
 
     template <typename T>
     vec<T>::~vec()
@@ -278,6 +280,17 @@ namespace sc
     }
 
     template <typename T>
+    void vec<T>::insert_at(T* item, size_t index, size_t count)
+    {
+        if(space <= size + count) {
+            reserve(size + count);
+        }
+
+        memcpy(&data[index], item, sizeof(T) * count);
+        size += count;
+    }
+
+    template <typename T>
     constexpr T* vec<T>::raw() noexcept
     {
         return data;
@@ -304,7 +317,7 @@ namespace sc
     template <typename T>
     constexpr bool vec<T>::empty() const
     {
-        size == 0;
+        return size == 0;
     }
 
     template <typename T>
