@@ -29,8 +29,6 @@ set(TEST_SOURCES
         ../futex.h
         ../mutex.h
         ../mutex.cpp
-        #    ../thread.h
-        #    ../thread.cpp
         ../typeutils.h
         ../smart_ptr.h
         ../unique.h
