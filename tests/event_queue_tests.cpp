@@ -4,8 +4,8 @@
 
 #include "doctest/doctest.h"
 #include "event_queue.h"
-#include "sc_types.h"
 #include "heap_alloc.h"
+#include "types.h"
 
 using namespace sc;
 

@@ -77,7 +77,7 @@ set(SC_MEM_SRC
         shared.h #TODO: implement, add unit tests
         event_queue.h
         event_queue.inl
-        sc_types.h)
+        types.h)
         #test.cpp)
 
 add_library(${PROJECT_NAME} ${SC_MEM_SRC})
