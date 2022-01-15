@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
-project(sc_memory)
+project(sc_base)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -77,10 +77,10 @@ set(SC_MEM_SRC
         shared.h #TODO: implement, add unit tests
         event_queue.h
         event_queue.inl
-        sc_types.h
-        test.cpp)
+        sc_types.h)
+        #test.cpp)
 
-add_executable(${PROJECT_NAME} ${SC_MEM_SRC})
+add_library(${PROJECT_NAME} ${SC_MEM_SRC})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR})
 if (WINSDKSYNC_FOUND)
     target_link_libraries(${PROJECT_NAME} ${winsdk_sync_lib})
