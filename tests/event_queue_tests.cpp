@@ -3,9 +3,9 @@
 //
 
 #include "doctest/doctest.h"
-#include "event_queue.h"
-#include "heap_alloc.h"
-#include "types.h"
+#include "../event_queue.h"
+#include "../heap_alloc.h"
+#include "../types.h"
 
 using namespace sc;
 

@@ -2,9 +2,9 @@
 // Created by novasurfer on 14/12/20.
 //
 
-#include "heap_alloc.h"
-#include "linear_alloc.h"
-#include "vec.h"
+#include "../heap_alloc.h"
+#include "../linear_alloc.h"
+#include "../vec.h"
 #include "doctest/doctest.h"
 #include <algorithm>
 #include <cstdlib>
