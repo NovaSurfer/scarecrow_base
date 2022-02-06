@@ -8,34 +8,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 if (MSVC)
-    find_package(WindowsSDK)
-    if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-        set(win_lib_suffixes lib/x64 lib)
-    else ()
-        set(win_lib_suffixes lib/x86 lib)
-    endif ()
-
-    if (WINDOWSSDK_FOUND)
-        set(winsdk_libs_dirs)
-        foreach (_dir ${WINDOWSSDK_DIRS})
-            get_windowssdk_library_dirs(${_dir} _lib_dirs)
-            if (_lib_dirs)
-                list(APPEND winsdk_hints ${_lib_dirs})
-            endif ()
-        endforeach ()
-    endif ()
-
-
-    find_library(
-            winsdk_sync_lib
-            NAMES
-            synchronization.lib
-            PATHS
-            winsdk_libs_dirs)
-
-    include(FindPackageHandleStandardArgs)
-    find_package_handle_standard_args(winsdksync winsdk_sync_lib)
-
     add_compile_options("/W4" "$<$<CONFIG:RELEASE>:/O2>")
     add_compile_options("/W4" "$<$<CONFIG:DEBUG>:/O0>")
 else ()
@@ -82,8 +54,8 @@ set(SC_MEM_SRC
 
 add_library(${PROJECT_NAME} ${SC_MEM_SRC})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR})
-if (WINSDKSYNC_FOUND)
-    target_link_libraries(${PROJECT_NAME} ${winsdk_sync_lib})
+if (MSVC)
+    target_link_libraries(${PROJECT_NAME} Synchronization)
 endif ()
 
 add_subdirectory(tests)
