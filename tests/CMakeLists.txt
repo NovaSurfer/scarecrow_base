@@ -38,6 +38,7 @@ set(TEST_SOURCES
         ../shared.h
         ../event_queue.h
         ../event_queue.inl
+        non_pod_struct.h
         vec_test.cpp
         hashmap_test.cpp
         arr_test.cpp
