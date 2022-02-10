@@ -11,7 +11,7 @@
 #include <vector>
 
 sc::heap_alloc halloc;
-sc::linear_alloc lalloc(halloc, sizeof(double) * 256, alignof(double));
+sc::linear_alloc lalloc(halloc, sizeof(double) * 1024, alignof(double));
 
 TEST_CASE("vector-operations-pods")
 {
