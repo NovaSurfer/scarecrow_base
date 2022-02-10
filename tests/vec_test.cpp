@@ -6,8 +6,8 @@
 #include "../linear_alloc.h"
 #include "../vec.h"
 #include "doctest/doctest.h"
+#include "non_pod_struct.h"
 #include <algorithm>
-#include <cstdlib>
 #include <vector>
 
 sc::heap_alloc halloc;
@@ -189,58 +189,6 @@ TEST_CASE("vector-operations-pods")
 }
 
 /*************** non-pod types ***************/
-struct NonPod
-{
-
-    NonPod()
-        : val(88.8)
-        , bytes((char*)malloc(256))
-
-    {
-        MESSAGE("default ctr");
-    }
-
-    NonPod(double dval)
-        : val(dval)
-        , bytes((char*)malloc(256))
-    {
-        MESSAGE("ctr");
-    }
-
-    NonPod(const NonPod& o)
-        : val(o.val)
-        , bytes((char*)malloc(256))
-    {
-        MESSAGE("copy ctr");
-        std::copy(o.bytes, o.bytes + 256, bytes);
-    }
-
-    NonPod& operator=(const NonPod& o)
-    {
-        MESSAGE("assignment operator");
-        if(this != &o) {
-            // free(bytes);
-            // bytes = nullptr;
-
-            bytes = (char*)malloc(256);
-            val = o.val;
-            std::copy(o.bytes, o.bytes + 256, bytes);
-        }
-        return *this;
-    }
-
-    //NonPod(NonPod&&) = default;
-
-    ~NonPod()
-    {
-        MESSAGE("dstr");
-        free(bytes);
-        bytes = nullptr;
-    }
-
-    char* bytes;
-    double val;
-};
 
 sc::heap_alloc halloc2;
 sc::linear_alloc lalloc2(halloc2, sizeof(NonPod) * 1024, alignof(NonPod));
