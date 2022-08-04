@@ -64,11 +64,11 @@ namespace sc
         return 0;
     }
 
-    template class temp_alloc<64>;
-    template class temp_alloc<128>;
-    template class temp_alloc<256>;
-    template class temp_alloc<512>;
-    template class temp_alloc<1024>;
-    template class temp_alloc<2048>;
-    template class temp_alloc<4096>;
+    template struct temp_alloc<64>;
+    template struct temp_alloc<128>;
+    template struct temp_alloc<256>;
+    template struct temp_alloc<512>;
+    template struct temp_alloc<1024>;
+    template struct temp_alloc<2048>;
+    template struct temp_alloc<4096>;
 }

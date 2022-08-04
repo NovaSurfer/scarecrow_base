@@ -108,10 +108,10 @@ namespace sc
 
     template <typename T>
     constexpr vec<T>::vec(vec&& other) noexcept
-        : alloc(move(other.alloc))
+        : data(move(other.data))
+        , alloc(move(other.alloc))
         , size(move(other.size))
         , space(move(other.space))
-        , data(move(other.data))
     { }
 
     template <typename T>

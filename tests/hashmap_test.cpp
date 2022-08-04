@@ -119,7 +119,6 @@ TEST_CASE("hashmap-add-remove-add")
 {
 
     constexpr uint32_t COUNT = 10;
-    char buff[COUNT];
 
     // my hashmap
     sc::hashmap<uint32_t, Pod> hmap(lalloc3);

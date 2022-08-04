@@ -65,8 +65,8 @@ struct NonPod
         bytes = nullptr;
     }
 
-    char* bytes;
     double val;
+    char* bytes;
 };
 
 #endif //SC_BASE_NON_POD_STRUCT_H

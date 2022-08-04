@@ -12,6 +12,8 @@
 namespace sc
 {
 
+    using nullptr_t = decltype(nullptr);
+
     /** 
      * Is Trivial
      * Reference: https://clang.llvm.org/docs/LanguageExtensions.html#type-trait-primitives

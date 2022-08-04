@@ -5,7 +5,6 @@
 #include "doctest/doctest.h"
 #include "../event_queue.h"
 #include "../heap_alloc.h"
-#include "../types.h"
 
 using namespace sc;
 
@@ -17,7 +16,7 @@ enum class EventType
 struct ButtonPressedEvent
 {
     u32 keycode;
-    double test_data;
+    float test_data;
 };
 
 TEST_CASE("event-stream")

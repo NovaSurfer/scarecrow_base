@@ -159,9 +159,9 @@ namespace sc
     }
 
     template <typename K, typename V>
-    constexpr void hashmap<K, V>::init(size_t capacity)
+    constexpr void hashmap<K, V>::init(size_t cap)
     {
-        this->capacity = capacity;
+        capacity = cap;
         kvps = static_cast<kv_pair*>(alloc->allocate(capacity * sizeof(kv_pair), alignof(kv_pair)));
         if constexpr(is_pointer_v<K>) {
             memset(kvps, 0, sizeof(kv_pair) * capacity);
@@ -234,8 +234,6 @@ namespace sc
         // 1) Find "stop" bucket
         //    empty bucket or DIB that equal to 0.
         // 2) Shift elements backward between deleted and stop buckets.
-        uint32_t prev_index = index;
-        uint32_t swap_index;
         for(uint32_t i = 1; i < capacity; ++i) {
             uint32_t prev_index = (index + i - 1) % capacity;
             uint32_t swap_index = (index + i) % capacity;
