@@ -24,8 +24,8 @@ set(TEST_SOURCES
         ../arr.h
         ../vec.h
         ../queue.h
-        ../MurmurHash3.h
-        ../MurmurHash3.cpp
+        ../murmur.h
+        ../murmur.cpp
         ../hash.h
         ../hashmap.h
         ../atomic_utils.h

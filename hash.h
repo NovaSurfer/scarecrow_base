@@ -1,4 +1,4 @@
-#include "MurmurHash3.h"
+#include "murmur.h"
 #include <cstdint>
 #include <cstring>
 
