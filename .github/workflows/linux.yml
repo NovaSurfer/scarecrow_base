@@ -9,8 +9,6 @@ on:
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
-  cc: "clang"
-  cxx: "clang++"
 
 jobs:
   build:
@@ -32,7 +30,7 @@ jobs:
       run: cmake --build ${{github.workspace}}/tests/build --config ${{env.BUILD_TYPE}}
 
     - name: Test
-      working-directory: ${{github.workspace}}/tests/build
+      working-directory: ${{github.workspace}}/tests/build/tests
       # Execute tests defined by the CMake configuration.  
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ./sc_base_test

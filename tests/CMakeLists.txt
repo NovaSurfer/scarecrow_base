@@ -1,14 +1,15 @@
 cmake_minimum_required(VERSION 3.10)
-
 project(sc_base_test)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(TEST_SOURCES
+set(DOCTEST_SOURCES
         unit.cpp
-        doctest/doctest.h
+        doctest/doctest.h)
+
+set(TEST_SOURCES
         ../compiler.h
         ../memory.h
         ../memory.cpp
@@ -48,7 +49,24 @@ set(TEST_SOURCES
         event_queue_tests.cpp
         )
 
-add_executable(sc_base_test ${TEST_SOURCES})
+add_executable(sc_base_test ${DOCTEST_SOURCES} ${TEST_SOURCES})
+
+if (MSVC)
+    set(MSVC_COMPILE_OPTIONS "/W4")
+    set(MSVC_COMPILE_DEBUG_OPTIONS "${MSVC_COMPILE_OPTIONS} /ZI /Od")
+    set(MSVC_COMPILE_RELEASE_OPTIONS "${MSVC_COMPILE_OPTIONS} /O3")
+    target_compile_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:DEBUG>:${MSVC_COMPILE_DEBUG_OPTIONS}>")
+    target_compile_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:RELEASE>:${MSVC_COMPILE_RELEASE_OPTIONS}>")
+    set_source_files_properties(TEST_SOURCES PROPERTIES COMPILE_FLAGS ${MSVC_COMPILE_OPTIONS})
+else ()
+    set(UNIX_COMPILE_OPTIONS "-Wall;-Werror;-Wextra;-Wshadow;-Wnon-virtual-dtor;-pedantic;-Wpadded;-Winvalid-pch;-faligned-new")
+    target_compile_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:RELEASE>:-O3>")
+    target_compile_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:DEBUG>:-O0>")
+    # Setting COMPILE_OPTIONS specifically for TEST_SOURCES to check for warnings library's code and test cases only
+    set_source_files_properties(${TEST_SOURCES} PROPERTIES COMPILE_OPTIONS ${UNIX_COMPILE_OPTIONS})
+endif ()
+
+
 target_include_directories(sc_base_test PUBLIC ${CMAKE_SOURCE_DIR})
 if (MSVC)
     target_link_libraries(sc_base_test Synchronization)
