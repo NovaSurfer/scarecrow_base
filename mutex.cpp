@@ -1,3 +1,5 @@
+// TODO: remove futex for MacOS build, cuz it's not supported on MacOS.
+#if SC_OS_LINUX || SC_OS_WINDOWS
 #include "mutex.h"
 #include "futex.h"
 #include "atomic_utils.h"
@@ -29,3 +31,4 @@ namespace sc
         }
     }
 }
+#endif
