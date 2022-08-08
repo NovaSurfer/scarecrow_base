@@ -42,12 +42,19 @@ struct NonPod
         std::copy(o.bytes, o.bytes + 256, bytes);
     }
 
+    NonPod(NonPod&& o) noexcept
+        : val(0)
+        , bytes(nullptr)
+    {
+        *this = sc::move(o);
+    }
+
     NonPod& operator=(const NonPod& o)
     {
         MESSAGE("assignment operator");
         if(this != &o) {
-            // free(bytes);
-            // bytes = nullptr;
+//             free(bytes);
+//             bytes = nullptr;
 
             bytes = (char*)malloc(256);
             val = o.val;
@@ -56,13 +63,27 @@ struct NonPod
         return *this;
     }
 
-    //NonPod(NonPod&&) = default;
+    NonPod& operator=(NonPod&& o)
+    {
+        free(bytes);
+
+        bytes = o.bytes;
+        val = o.val;
+
+        o.bytes = nullptr;
+        o.val = 0;
+
+        return *this;
+    }
+
 
     ~NonPod()
     {
         MESSAGE("dstr");
-        free(bytes);
-        bytes = nullptr;
+        if (bytes) {
+            free(bytes);
+            bytes = nullptr;
+        }
     }
 
     double val;

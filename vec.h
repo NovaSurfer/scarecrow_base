@@ -77,7 +77,7 @@ namespace sc
         data = static_cast<T*>(alloc->allocate(sizeof(T) * space, alignof(T)));
         if constexpr(!is_trivial_v<T>) {
             for(size_t i = 0; i < space; ++i) {
-                new(data + i) T();
+                ::new(data + i) T();
             }
         }
     }
@@ -90,7 +90,7 @@ namespace sc
     {
         data = static_cast<T*>(alloc->allocate(sizeof(T) * space, alignof(T)));
         for(size_t i = 0; i < space; ++i) {
-            new(data + i) T(item);
+            ::new(data + i) T(item);
         }
     }
 
@@ -102,17 +102,19 @@ namespace sc
     {
         data = static_cast<T*>(alloc->allocate(sizeof(T) * space, alignof(T)));
         for(size_t i = 0; i < size; ++i) {
-            new(data + i) T(other.data[i]);
+            ::new(data + i) T(other.data[i]);
         }
     }
 
     template <typename T>
     constexpr vec<T>::vec(vec&& other) noexcept
-        : data(move(other.data))
-        , alloc(move(other.alloc))
-        , size(move(other.size))
-        , space(move(other.space))
-    { }
+        : data(nullptr)
+        , alloc(nullptr)
+        , size(0)
+        , space(0)
+    {
+       *this = sc::move(other);
+    }
 
     template <typename T>
     vec<T>::~vec()
@@ -163,7 +165,7 @@ namespace sc
 
             if(data) {
                 for(size_t i = 0; i < size; ++i) {
-                    new(new_data + i) T(data[i]);
+                    ::new(new_data + i) T(data[i]);
                 }
 
                 if constexpr(!is_trivial_v<T>) {
@@ -187,7 +189,7 @@ namespace sc
             reserve(new_size);
             if constexpr(!is_trivial_v<T>) {
                 for(size_t i = size; i < new_size; ++i) {
-                    new(data + i) T();
+                    ::new(data + i) T();
                 }
             }
 
@@ -210,7 +212,7 @@ namespace sc
 
             if constexpr(!is_trivial_v<T>) {
                 for(size_t i = 0; i < size; ++i) {
-                    new(new_data + i) T(data[i]);
+                    ::new(new_data + i) T(data[i]);
                 }
 
                 for(size_t i = 0; i < size; ++i) {
@@ -247,7 +249,9 @@ namespace sc
             }
         }
 
-        alloc->deallocate(data);
+        if(alloc) {
+            alloc->deallocate(data);
+        }
         size = space = 0;
     }
 
@@ -275,7 +279,7 @@ namespace sc
             reserve(space * vec::GROWTH_FACTOR);
         }
 
-        data[size] = T(forward<Args>(args)...);
+        ::new(data + size) T(forward<Args>(args)...);
         ++size;
     }
 
