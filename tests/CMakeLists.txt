@@ -28,6 +28,7 @@ set(TEST_SOURCES
         ../murmur.h
         ../murmur.cpp
         ../hash.h
+        ../hash.cpp
         ../hashmap.h
         ../atomic_utils.h
         ../futex.h

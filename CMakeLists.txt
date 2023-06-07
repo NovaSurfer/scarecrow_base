@@ -28,6 +28,7 @@ set(SC_MEM_SRC
         murmur.h
         murmur.cpp
         hash.h
+        hash.cpp
         hashmap.h
         atomic_utils.h
         futex.h
