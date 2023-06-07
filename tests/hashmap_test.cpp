@@ -33,7 +33,7 @@ inline bool operator==(const Pod& lhs, const Pod& rhs)
 
 // Adds new template specialization for a Pod struct.
 template <>
-sc::u32 sc::hash<>(Pod key)
+u32 sc::hash<>(Pod key)
 {
     int out[2];
     const int* ptr1 = &key.a;
@@ -64,10 +64,10 @@ TEST_CASE("hash")
 
     SUBCASE("hash-template-fn-overload")
     {
-        MESSAGE(sc::hash(Pod{1,1}));
-        MESSAGE(sc::hash(Pod{2,2}));
-        MESSAGE(sc::hash(Pod{3,3}));
-        MESSAGE(sc::hash(Pod{4,4}));
+        MESSAGE(sc::hash(Pod {1, 1}));
+        MESSAGE(sc::hash(Pod {2, 2}));
+        MESSAGE(sc::hash(Pod {3, 3}));
+        MESSAGE(sc::hash(Pod {4, 4}));
     }
 }
 
@@ -216,7 +216,7 @@ TEST_CASE("hashmap-add-get-not-found")
     hmap.init(1);
     hmap.put(1, {1, 1});
 
-    const Pod pod {1,1};
+    const Pod pod {1, 1};
     CHECK(pod == hmap.get(1));
 
     const Pod dpod {};
@@ -225,7 +225,7 @@ TEST_CASE("hashmap-add-get-not-found")
 
 TEST_CASE("hashmap-incorrect-get")
 {
-    std::unordered_map<std::string, int> nums_map{
+    std::unordered_map<std::string, int> nums_map {
         {"one", 1},
         {"two", 2},
         {"three", 3},
@@ -233,7 +233,7 @@ TEST_CASE("hashmap-incorrect-get")
 
     int& incorrent_get = nums_map["four"];
 
-    sc::hashmap<const char*, int> sc_nums_map{lalloc3};
+    sc::hashmap<const char*, int> sc_nums_map {lalloc3};
     sc_nums_map.init(3);
     sc_nums_map.put("one", 1);
     sc_nums_map.put("two", 2);
