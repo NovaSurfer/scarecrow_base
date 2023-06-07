@@ -5,6 +5,7 @@
 #ifndef SC_BASE_DBG_ASSERTS_H
 #define SC_BASE_DBG_ASSERTS_H
 
+#include "logout.h"
 #include <cstdlib>
 
 #ifdef NDEBUG
@@ -36,7 +37,7 @@
 #    define DBG_WARN_IF(expr, msg)                                                                 \
         {                                                                                          \
             if(static_cast<bool>(expr)) {                                                          \
-                log_warn_cmd("%s, %s.", #expr, #msg);                                              \
+                log_warn_cmd("%s, %s.", #expr, msg);                                               \
             }                                                                                      \
         }
 
