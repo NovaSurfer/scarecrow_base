@@ -16,7 +16,6 @@ namespace sc::logging
         static std::mutex mtx;
         std::lock_guard<std::mutex> lock(mtx);
 
-        time_t t = time(nullptr);
         tm lt {};
 
 #if COMPILER_CLANG || COMPILER_GCC
