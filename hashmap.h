@@ -1,3 +1,6 @@
+#ifndef SC_BASE_HASHMAP_H
+#define SC_BASE_HASHMAP_H
+
 /**
  * Hashmap with open addressing and Robin Hood reordering scheme.
  * Backward shift deleteion.
@@ -18,7 +21,10 @@
  */
 
 #include "allocator.h"
+#include "dbg_asserts.h"
 #include "hash.h"
+#include "logout.h"
+#include <cassert>
 
 namespace sc
 {
@@ -107,7 +113,7 @@ namespace sc
         /**
 	 * Sets allocator.
 	 */
-        constexpr hashmap(allocator& default_alloc);
+        constexpr explicit hashmap(allocator& default_alloc);
 
         /**
 	 * Destroys map, sets size and capacity to 0.
@@ -129,9 +135,9 @@ namespace sc
 	 * Gets value by key.
 	 * @return default constructed value on fail.
 	 */
-        constexpr V get(const K& key) const;
+        V& get(const K& key) const;
         constexpr void remove(const K& key);
-        constexpr uint32_t len() const;
+        [[nodiscard]] constexpr uint32_t len() const;
         constexpr iter begin() const;
         constexpr iter end() const;
 
@@ -148,7 +154,7 @@ namespace sc
         , kvps(nullptr)
         , size(0)
         , capacity(0)
-    {}
+    { }
 
     template <typename K, typename V>
     hashmap<K, V>::~hashmap()
@@ -173,6 +179,7 @@ namespace sc
     template <typename K, typename V>
     constexpr bool hashmap<K, V>::put(const K& key, const V& value)
     {
+        DBG_FAIL_IF(size == capacity, "can't insert anymore")
         if(size == capacity) {
             return false;
         }
@@ -205,7 +212,7 @@ namespace sc
     }
 
     template <typename K, typename V>
-    constexpr V hashmap<K, V>::get(const K& key) const
+    V& hashmap<K, V>::get(const K& key) const
     {
         uint32_t key_hash = hash(key);
         uint32_t index = key_hash % capacity;
@@ -214,10 +221,11 @@ namespace sc
             index = (index + 1) % capacity;
             kv = kvps[index];
             if(index == key_hash % capacity) {
-                return V();
+                static V default_value = V();
+                return default_value;
             }
         }
-        return kv.value;
+        return kvps[index].value;
     }
 
     template <typename K, typename V>
@@ -265,3 +273,5 @@ namespace sc
         return kv_iter(kvps, capacity, 0xffffffffU);
     }
 }
+
+#endif //SC_BASE_HASHMAP_H
