@@ -2,6 +2,8 @@
 #include "../heap_alloc.h"
 #include "../linear_alloc.h"
 #include "doctest/doctest.h"
+#include <cstdlib>
+#include <string>
 #include <unordered_map>
 
 struct Pod
@@ -29,14 +31,27 @@ inline bool operator==(const Pod& lhs, const Pod& rhs)
 //     return str;
 // }
 
+// Adds new template specialization for a Pod struct.
+template <>
+sc::u32 sc::hash<>(Pod key)
+{
+    int out[2];
+    const int* ptr1 = &key.a;
+    const int* ptr2 = &key.b;
+    MurmurHash3_x86_32(ptr1, sizeof(int), HASH_SEED, &out[0]);
+    MurmurHash3_x86_32(ptr2, sizeof(int), HASH_SEED, &out[1]);
+
+    return out[0] ^ out[1];
+}
+
 TEST_CASE("hash")
 {
     SUBCASE("hash-int")
     {
-        MESSAGE(sc::hash(1));
-        MESSAGE(sc::hash(2));
-        MESSAGE(sc::hash(3));
-        MESSAGE(sc::hash(4));
+        MESSAGE(sc::hash(1U));
+        MESSAGE(sc::hash(2U));
+        MESSAGE(sc::hash(3U));
+        MESSAGE(sc::hash(4U));
     }
 
     SUBCASE("hash-str")
@@ -45,6 +60,14 @@ TEST_CASE("hash")
         MESSAGE(sc::hash("2"));
         MESSAGE(sc::hash("3"));
         MESSAGE(sc::hash("4"));
+    }
+
+    SUBCASE("hash-template-fn-overload")
+    {
+        MESSAGE(sc::hash(Pod{1,1}));
+        MESSAGE(sc::hash(Pod{2,2}));
+        MESSAGE(sc::hash(Pod{3,3}));
+        MESSAGE(sc::hash(Pod{4,4}));
     }
 }
 
@@ -198,4 +221,25 @@ TEST_CASE("hashmap-add-get-not-found")
 
     const Pod dpod {};
     CHECK(dpod == hmap.get(2));
+}
+
+TEST_CASE("hashmap-incorrect-get")
+{
+    std::unordered_map<std::string, int> nums_map{
+        {"one", 1},
+        {"two", 2},
+        {"three", 3},
+    };
+
+    int& incorrent_get = nums_map["four"];
+
+    sc::hashmap<const char*, int> sc_nums_map{lalloc3};
+    sc_nums_map.init(3);
+    sc_nums_map.put("one", 1);
+    sc_nums_map.put("two", 2);
+    sc_nums_map.put("three", 3);
+
+    int& sc_incorrent_get = sc_nums_map.get("four");
+
+    REQUIRE_EQ(incorrent_get, sc_incorrent_get);
 }
