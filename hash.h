@@ -1,23 +1,33 @@
+#ifndef SC_BASE_HASH_H
+#define SC_BASE_HASH_H
+
 #include "murmur.h"
-#include <cstdint>
+#include "sc_types.h"
 #include <cstring>
 
 namespace sc
 {
-    static constexpr uint32_t HASH_SEED = 0x81D;
+    static constexpr u32 HASH_SEED = 0x81D;
 
-    uint32_t hash(uint32_t key)
+    template <typename T>
+    u32 hash(T);
+
+    template <>
+    u32 hash<>(uint32_t key)
     {
-        uint32_t result[1];
-	    const uint32_t* ptr = &key;
-        MurmurHash3_x86_32(ptr, sizeof(uint32_t), HASH_SEED, result);
+        u32 result[1];
+        const u32* ptr = &key;
+        MurmurHash3_x86_32(ptr, sizeof(u32), HASH_SEED, result);
         return *result;
     }
 
-    uint32_t hash(const char* key)
+    template <>
+    u32 hash<>(const char* key)
     {
-        uint32_t result[1];
+        u32 result[1];
         MurmurHash3_x86_32(&key, strlen(key), HASH_SEED, result);
         return *result;
     }
 }
+
+#endif //SC_BASE_HASH_H
