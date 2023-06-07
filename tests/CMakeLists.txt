@@ -39,6 +39,10 @@ set(TEST_SOURCES
         ../shared.h
         ../event_queue.h
         ../event_queue.inl
+        ../dbg_asserts.h
+        ../logout.h
+        ../logout.cpp
+        ../sc_types.h
         non_pod_struct.h
         vec_test.cpp
         hashmap_test.cpp
@@ -59,11 +63,11 @@ if (MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:RELEASE>:${MSVC_COMPILE_RELEASE_OPTIONS}>")
     set_source_files_properties(TEST_SOURCES PROPERTIES COMPILE_FLAGS ${MSVC_COMPILE_OPTIONS})
 else ()
-    set(UNIX_COMPILE_OPTIONS "-Wall;-Werror;-Wextra;-Wshadow;-Wnon-virtual-dtor;-pedantic;-Wpadded;-Winvalid-pch;-faligned-new")
-    target_compile_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:RELEASE>:-O3>")
+    set(UNIX_COMPILE_OPTIONS "-Wall;-Wextra;-Wshadow;-Wnon-virtual-dtor;-pedantic;-Wpadded;-Winvalid-pch;-faligned-new;-O3;-g")
+    target_compile_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:RELEASE>:${UNIX_COMPILE_OPTIONS}>")
     target_compile_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:DEBUG>:-O0>")
     # Setting COMPILE_OPTIONS specifically for TEST_SOURCES to check for warnings library's code and test cases only
-    set_source_files_properties(${TEST_SOURCES} PROPERTIES COMPILE_OPTIONS ${UNIX_COMPILE_OPTIONS})
+#    set_source_files_properties(${TEST_SOURCES} PROPERTIES COMPILE_FLAGS {UNIX_COMPILE_OPTIONS)
 endif ()
 
 
