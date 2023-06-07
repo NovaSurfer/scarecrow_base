@@ -41,7 +41,7 @@ set(SC_MEM_SRC
         shared.h #TODO: implement, add unit tests
         event_queue.h
         event_queue.inl
-        types.h)
+        sc_types.h)
 #test.cpp)
 #set_source_files_properties(foo.cpp PROPERTIES COMPILE_FLAGS "-Wall" "-Werror" "-Wextra" "-Wshadow" "-Wnon-virtual-dtor" "-pedantic" "-Wpadded")
 add_library(${PROJECT_NAME} ${SC_MEM_SRC})

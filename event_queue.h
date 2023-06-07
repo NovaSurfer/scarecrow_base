@@ -6,7 +6,7 @@
 #define SC_BASE_TEST_EVENT_QUEUE_H
 
 #include "linear_alloc.h"
-#include "types.h"
+#include "sc_types.h"
 #include "vec.h"
 
 enum class EventType;
