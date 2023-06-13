@@ -57,18 +57,18 @@ set(TEST_SOURCES
 add_executable(sc_base_test ${DOCTEST_SOURCES} ${TEST_SOURCES})
 
 if (MSVC)
-    set(MSVC_COMPILE_OPTIONS "/W4")
-    set(MSVC_COMPILE_DEBUG_OPTIONS "${MSVC_COMPILE_OPTIONS} /ZI /Od")
-    set(MSVC_COMPILE_RELEASE_OPTIONS "${MSVC_COMPILE_OPTIONS} /O3")
+    set(MSVC_COMPILE_OPTIONS "/Wall")
+    set(MSVC_COMPILE_DEBUG_OPTIONS ${MSVC_COMPILE_OPTIONS} "/ZI" "/Od")
+    set(MSVC_COMPILE_RELEASE_OPTIONS ${MSVC_COMPILE_OPTIONS} "/O2")
     target_compile_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:DEBUG>:${MSVC_COMPILE_DEBUG_OPTIONS}>")
     target_compile_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:RELEASE>:${MSVC_COMPILE_RELEASE_OPTIONS}>")
-    set_source_files_properties(TEST_SOURCES PROPERTIES COMPILE_FLAGS ${MSVC_COMPILE_OPTIONS})
+#    set_source_files_properties(TEST_SOURCES PROPERTIES COMPILE_FLAGS ${MSVC_COMPILE_OPTIONS})
 else ()
     set(UNIX_COMPILE_OPTIONS "-Wall;-Wextra;-Wshadow;-Wnon-virtual-dtor;-pedantic;-Wpadded;-Winvalid-pch;-faligned-new;-O3;-g")
     target_compile_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:RELEASE>:${UNIX_COMPILE_OPTIONS}>")
     target_compile_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:DEBUG>:-O0>")
     # Setting COMPILE_OPTIONS specifically for TEST_SOURCES to check for warnings library's code and test cases only
-#    set_source_files_properties(${TEST_SOURCES} PROPERTIES COMPILE_FLAGS {UNIX_COMPILE_OPTIONS)
+#    set_source_files_properties(${TEST_SOURCES} PROPERTIES COMPILE_FLAGS ${UNIX_COMPILE_OPTIONS})
 endif ()
 
 
