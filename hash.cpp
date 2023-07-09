@@ -22,4 +22,10 @@ namespace sc
         MurmurHash3_x86_32(&key, strlen(key), HASH_SEED, result);
         return *result;
     }
+
+    template <>
+    const char* DEFVAL<const char*> {nullptr};
+
+    template <>
+    u32 DEFVAL<u32> {0xffffffffU};
 }

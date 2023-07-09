@@ -28,11 +28,6 @@
 
 namespace sc
 {
-    template <typename T>
-    constexpr inline T DEFVAL = nullptr;
-
-    template <>
-    constexpr inline uint32_t DEFVAL<uint32_t> = 0xffffffffU;
 
     /**
      * Hashmap with open addressing, Robin Hood reordering scheme, backward shift deleteion

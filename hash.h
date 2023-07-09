@@ -17,6 +17,9 @@ namespace sc
 
     template <>
     u32 hash<>(const char* key);
+
+    template <typename T>
+    extern T DEFVAL;
 }
 
 #endif //SC_BASE_HASH_H
