@@ -1,15 +1,12 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 project(sc_base_test)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(DOCTEST_SOURCES
-        unit.cpp
-        doctest/doctest.h)
-
 set(TEST_SOURCES
+        unit.cpp
         ../compiler.h
         ../memory.h
         ../memory.cpp
@@ -54,7 +51,7 @@ set(TEST_SOURCES
         event_queue_tests.cpp
         )
 
-add_executable(sc_base_test ${DOCTEST_SOURCES} ${TEST_SOURCES})
+add_executable(sc_base_test ${TEST_SOURCES})
 
 if (MSVC)
     set(MSVC_COMPILE_OPTIONS "/Wall")
@@ -72,7 +69,8 @@ else ()
 endif ()
 
 
-target_include_directories(sc_base_test PUBLIC ${CMAKE_SOURCE_DIR})
+include(doctest.cmake)
+target_include_directories(sc_base_test PUBLIC ${CMAKE_SOURCE_DIR} ${doctest_SOURCE_DIR})
 if (MSVC)
     target_link_libraries(sc_base_test Synchronization)
 endif ()
