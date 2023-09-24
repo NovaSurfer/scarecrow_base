@@ -2,7 +2,10 @@
 // Created by novasurfer on 10/21/20.
 //
 
+#include "memory.h"
 #include "compiler.h"
+#include "sc_types.h"
+#include <new>
 
 #if SC_COMPILER_GCC || SC_COMPILER_CLANG
 #    include <cstdlib>
@@ -14,10 +17,6 @@
 #    define free_aligned(ptr) _aligned_free(ptr)
 #    define realloc_aligned(ptr, bytes, alignment) _aligned_realloc(ptr, bytes, alignment)
 #endif
-
-#include "memory.h"
-#include <cstdint>
-#include <new>
 
 namespace sc
 {
@@ -178,7 +177,7 @@ namespace sc
 
 #endif
 
-}
+} // namespace sc
 
 #if defined(SC_ALLOC_WITH_HEADER)
 void* operator new(size_t size)

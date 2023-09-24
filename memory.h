@@ -11,7 +11,7 @@ namespace sc
 {
 
     // TODO: Implement type name info.
-    
+
 #if defined(SC_ALLOC_WITH_HEADER)
 
     /**
@@ -19,7 +19,7 @@ namespace sc
      */
     enum class memhead_type : unsigned
     {
-	NONE = 0x00,
+        NONE = 0x00,
         SIZE = 0x01,
         ALIGN = 0x02,
         NAME = 0x04
@@ -43,64 +43,64 @@ namespace sc
      */
     struct mem
     {
-	/**
-	 * Allocates @param size bytes of uninitialized storage.
-	 */
-	static void* alloc(size_t size);
-	
-	/**
-	 * Deallocates the space previously allocated by alloc().
-	 */
-	static void dealloc(void* ptr);
-	
-	/**
-	 * Allocate size bytes of uninitialized storage whose alignment is specified by alignment. 
-	 * The size parameter must be an integral multiple of alignment.
-	 */
+        /**
+         * Allocates @param size bytes of uninitialized storage.
+         */
+        static void* alloc(size_t size);
+
+        /**
+         * Deallocates the space previously allocated by alloc().
+         */
+        static void dealloc(void* ptr);
+
+        /**
+         * Allocate size bytes of uninitialized storage whose alignment is specified by alignment.
+         * The size parameter must be an integral multiple of alignment.
+         */
         static void* alloc_aligned(size_t size, size_t align);
-	
-	/**
-	 * Deallocates the space previously allocated by alloc_aligned().
-	 */
+
+        /**
+         * Deallocates the space previously allocated by alloc_aligned().
+         */
         static void dealloc_aligned(void* ptr);
-	
+
 #if defined(SC_ALLOC_WITH_HEADER)
         /**
-	 * Sets memory header flags.
-	 * Can be read with allocated_size(), allocated_alignment().
-	 */
-	static void set_header(memhead_type header_flags);
-	
-	/**
-	 * Returns the previously allocated size by alloc() or alloc_aligned().
-	 */
+         * Sets memory header flags.
+         * Can be read with allocated_size(), allocated_alignment().
+         */
+        static void set_header(memhead_type header_flags);
+
+        /**
+         * Returns the previously allocated size by alloc() or alloc_aligned().
+         */
         static size_t allocated_size(void* ptr);
-	
-	/**
-	 * Returns the alignment of the allocation made by alloc_aligned(). 
-	 */
+
+        /**
+         * Returns the alignment of the allocation made by alloc_aligned().
+         */
         static size_t allocated_alignment(void* ptr);
 
     private:
-	static memhead_type HEADER_FLAGS;
-	static size_t HEADER_SIZE;
+        static memhead_type HEADER_FLAGS;
+        static size_t HEADER_SIZE;
 #endif
-	mem() = delete;
-	~mem() = delete;
-	mem(const mem&) = delete;
-	mem(mem&&) = delete;
-	mem& operator=(const mem&) = delete;
-	mem& operator=(mem&&) = delete;
+        mem() = delete;
+        ~mem() = delete;
+        mem(const mem&) = delete;
+        mem(mem&&) = delete;
+        mem& operator=(const mem&) = delete;
+        mem& operator=(mem&&) = delete;
     };
-}
+} // namespace sc
 
 #if defined(SC_ALLOC_WITH_HEADER)
 void* operator new(size_t size);
-void* operator new[] (size_t size);
+void* operator new[](size_t size);
 void operator delete(void* ptr) noexcept;
 void operator delete(void* ptr, size_t size) noexcept;
 void operator delete[](void* ptr) noexcept;
 void operator delete[](void* ptr, size_t size) noexcept;
 #endif
 
-#endif //SC_MEMORY_H
+#endif // SC_MEMORY_H
