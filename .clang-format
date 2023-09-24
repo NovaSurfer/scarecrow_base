@@ -17,7 +17,7 @@ AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
 AlignEscapedNewlinesLeft: false
 AlignOperands:   true
-AlignTrailingComments: false
+AlignTrailingComments: true
 AllowAllParametersOfDeclarationOnNextLine: true
 AllowShortBlocksOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: false
@@ -64,7 +64,7 @@ DerivePointerAlignment: false
 ExperimentalAutoDetectBinPacking: false
 ForEachMacros:   ['RANGES_FOR', 'FOREACH']
 IndentCaseLabels: false
-FixNamespaceComments: false
+FixNamespaceComments: true
 IndentWrappedFunctionNames: false
 KeepEmptyLinesAtTheStartOfBlocks: true
 MacroBlockBegin: ''
@@ -91,6 +91,6 @@ SpacesInParentheses: false
 SpacesInSquareBrackets: false
 SpaceAfterTemplateKeyword: true
 
-ReflowComments: false
+ReflowComments: true
 IncludeBlocks: Preserve
 IndentPPDirectives: AfterHash
