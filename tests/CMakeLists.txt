@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+
+add_definitions("-DSC_ALLOC_WITH_HEADER")
+
 set(TEST_SOURCES
         unit.cpp
         ../compiler.h
@@ -13,12 +16,8 @@ set(TEST_SOURCES
         ../allocator.h
         ../heap_alloc.h
         ../heap_alloc.cpp
-        ../linear_alloc.h
-        ../linear_alloc.cpp
-        ../temp_alloc.h
-        ../temp_alloc.cpp
-        ../pool_alloc.h
-        ../pool_alloc.cpp
+        ../arena_alloc.cpp
+        ../arena_alloc.h
         ../arr.h
         ../vec.h
         ../queue.h
@@ -49,7 +48,8 @@ set(TEST_SOURCES
         unique_test.cpp
         shared_test.cpp
         event_queue_tests.cpp
-        )
+        arena_alloc_test.cpp
+)
 
 add_executable(sc_base_test ${TEST_SOURCES})
 

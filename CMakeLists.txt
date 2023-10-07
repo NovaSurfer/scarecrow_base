@@ -16,12 +16,6 @@ set(SC_MEM_SRC
         allocator.h
         heap_alloc.h
         heap_alloc.cpp
-        linear_alloc.h
-        linear_alloc.cpp
-        temp_alloc.h
-        temp_alloc.cpp
-        pool_alloc.h
-        pool_alloc.cpp #TODO: fix SEGFAULT
         arr.h
         vec.h
         queue.h
@@ -45,7 +39,9 @@ set(SC_MEM_SRC
         sc_types.h
         dbg_asserts.h
         logout.h
-        logout.cpp)
+        logout.cpp
+        arena_alloc.cpp
+        arena_alloc.h)
 #test.cpp)
 #set_source_files_properties(foo.cpp PROPERTIES COMPILE_FLAGS "-Wall" "-Werror" "-Wextra" "-Wshadow" "-Wnon-virtual-dtor" "-pedantic" "-Wpadded")
 add_library(${PROJECT_NAME} ${SC_MEM_SRC})
