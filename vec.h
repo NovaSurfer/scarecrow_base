@@ -18,7 +18,7 @@ namespace sc
     {
     public:
         constexpr vec() = delete;
-        constexpr vec(allocator& alc);
+        constexpr explicit vec(allocator& alc);
         constexpr explicit vec(allocator& alc, size_t len);
         constexpr vec(allocator& alc, size_t len, const T& item);
         constexpr vec(const vec& other);
@@ -286,10 +286,9 @@ namespace sc
     template <typename T>
     void vec<T>::insert_at(T* item, size_t index, size_t count)
     {
-        if(space <= size + count) {
-            reserve(size + count);
-        }
+        static_assert(is_trivial_v<T>);
 
+        reserve(size + count);
         memcpy(&data[index], item, sizeof(T) * count);
         size += count;
     }
