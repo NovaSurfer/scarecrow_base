@@ -27,7 +27,7 @@ namespace sc
             prev_offset = offset;
             curr_offset = offset + size;
 
-//            memset(ptr, 0, size);
+            //            memset(ptr, 0, size);
             return ptr;
         }
 
@@ -53,9 +53,9 @@ namespace sc
                 memmove(new_memory, old_memory, copy_size);
                 return new_memory;
             }
-        } else {
-            DBG_FAIL("Memory is out of bounds of the buffer in this arena")
         }
+        DBG_FAIL("Memory is out of bounds of the buffer in this arena")
+        return nullptr;
     }
 
     void arena_alloc::deallocate([[maybe_unused]] void* ptr)
