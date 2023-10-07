@@ -4,6 +4,7 @@
 
 #include "memory.h"
 #include "compiler.h"
+#include "dbg_asserts.h"
 #include "sc_types.h"
 #include <new>
 
@@ -151,6 +152,23 @@ namespace sc
     {
         HEADER_FLAGS = header_flags;
         HEADER_SIZE = total_mem_header_size(HEADER_FLAGS);
+    }
+
+    uintptr mem::align_forward(uintptr ptr, size_t align)
+    {
+        DBG_FAIL_IF(!is_power_of_two(align) || align == 0, "Alignment should be power of 2")
+
+        uintptr p = ptr;
+        uintptr a = static_cast<uintptr>(align);
+        uintptr modulo = p & (a - 1);
+
+        if(modulo != 0) {
+            // If 'p' address is not aligned, push the address to the
+            // next value which is aligned
+            p += a - modulo;
+        }
+
+        return p;
     }
 
 #else /* ------------------------------------------------------------- */

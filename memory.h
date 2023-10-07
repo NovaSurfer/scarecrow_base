@@ -5,6 +5,7 @@
 #ifndef SC_MEMORY_H
 #define SC_MEMORY_H
 
+#include "sc_types.h"
 #include <cstddef>
 
 namespace sc
@@ -63,6 +64,13 @@ namespace sc
          * Deallocates the space previously allocated by alloc_aligned().
          */
         static void dealloc_aligned(void* ptr);
+
+        static constexpr bool is_power_of_two(uintptr val)
+        {
+            return (val & (val - 1)) == 0;
+        }
+
+        static uintptr align_forward(uintptr ptr, size_t align);
 
 #if defined(SC_ALLOC_WITH_HEADER)
         /**
