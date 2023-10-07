@@ -9,6 +9,7 @@
 #include <cstdlib>
 
 #ifdef NDEBUG
+#    define DBG_FAIL(msg) static_cast<void>(0);
 #    define DBG_FAIL_IF(expr, msg) static_cast<void>(0);
 #    define DBG_CONSTEXPR_FAIL_IF(expr, msg) static_cast<void>(0);
 #    define DBG_WARN_IF(expr, msg) static_cast<void>(0);
@@ -18,6 +19,13 @@
 #    define DBG_WARN_ON_RENDER_ERR static_cast<void>(0);
 
 #else // DEBUG ON
+
+#    define DBG_FAIL(msg)                                                                          \
+        {                                                                                          \
+            log_err_cmd("%s", msg);                                                                \
+            abort();                                                                               \
+        }
+
 #    define DBG_FAIL_IF(expr, msg)                                                                 \
         {                                                                                          \
             if(static_cast<bool>(expr)) {                                                          \
@@ -75,6 +83,6 @@
             }                                                                                      \
         }
 
-#endif //NDEBUG
+#endif // NDEBUG
 
-#endif //SC_BASE_DBG_ASSERTS_H
+#endif // SC_BASE_DBG_ASSERTS_H

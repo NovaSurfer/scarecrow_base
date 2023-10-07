@@ -5,8 +5,8 @@
 #ifndef SC_BASE_TEST_EVENT_QUEUE_H
 #define SC_BASE_TEST_EVENT_QUEUE_H
 
-#include "linear_alloc.h"
 #include "sc_types.h"
+#include "heap_alloc.h"
 #include "vec.h"
 
 enum class EventType;
@@ -30,7 +30,7 @@ namespace sc
         { }
 
         template <typename T>
-        void write(EventType type, const T& event);
+        void write(EventType type, T& event);
 
         constexpr size_t len() const;
 
@@ -39,7 +39,7 @@ namespace sc
     private:
         vec<char> stream;
 
-        void write(EventType type, u32 size, const void* event);
+        void write(EventType type, u32 size, void* event);
     };
 }
 

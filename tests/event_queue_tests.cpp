@@ -4,7 +4,6 @@
 
 #include "doctest/doctest.h"
 #include "../event_queue.h"
-#include "../heap_alloc.h"
 
 using namespace sc;
 
@@ -21,7 +20,6 @@ struct ButtonPressedEvent
 
 TEST_CASE("event-stream")
 {
-
     heap_alloc halloc;
     event_queue events(halloc);
 

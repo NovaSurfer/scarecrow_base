@@ -20,7 +20,7 @@ namespace sc
         virtual void* allocate(size_t size, size_t align) = 0;
         virtual void deallocate(void* ptr) = 0;
         virtual size_t total_allocated() = 0;
-        virtual ~allocator() {};
+        virtual ~allocator() = default;
 
         template <typename T, typename... TArgs>
         T* make_new(TArgs&&... args);

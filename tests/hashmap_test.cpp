@@ -1,6 +1,5 @@
 #include "../hashmap.h"
 #include "../heap_alloc.h"
-#include "../linear_alloc.h"
 #include "doctest/doctest.h"
 #include <cstdlib>
 #include <string>
@@ -71,17 +70,16 @@ TEST_CASE("hash")
     }
 }
 
-sc::heap_alloc halloc3;
-sc::linear_alloc lalloc3(halloc3, sizeof(Pod) * 512, alignof(Pod));
 
 TEST_CASE("hashmap-stress")
 {
+    sc::heap_alloc halloc;
     constexpr uint32_t LOAD_FACTOR = 85;
     constexpr uint32_t COUNT = 10;
     constexpr uint32_t LIMIT = COUNT * LOAD_FACTOR / 100;
 
     // my hashmap
-    sc::hashmap<uint32_t, Pod> hmap(lalloc3);
+    sc::hashmap<uint32_t, Pod> hmap(halloc);
     hmap.init(COUNT);
 
     // stl hashmap
@@ -141,10 +139,11 @@ TEST_CASE("hashmap-stress")
 TEST_CASE("hashmap-add-remove-add")
 {
 
+    sc::heap_alloc halloc;
     constexpr uint32_t COUNT = 10;
 
     // my hashmap
-    sc::hashmap<uint32_t, Pod> hmap(lalloc3);
+    sc::hashmap<uint32_t, Pod> hmap(halloc);
     hmap.init(COUNT);
 
     // stl hashmap
@@ -212,7 +211,8 @@ TEST_CASE("hashmap-add-remove-add")
 
 TEST_CASE("hashmap-add-get-not-found")
 {
-    sc::hashmap<uint32_t, Pod> hmap(lalloc3);
+    sc::heap_alloc halloc;
+    sc::hashmap<uint32_t, Pod> hmap(halloc);
     hmap.init(1);
     hmap.put(1, {1, 1});
 
@@ -225,6 +225,7 @@ TEST_CASE("hashmap-add-get-not-found")
 
 TEST_CASE("hashmap-incorrect-get")
 {
+    sc::heap_alloc halloc;
     std::unordered_map<std::string, int> nums_map {
         {"one", 1},
         {"two", 2},
@@ -233,7 +234,7 @@ TEST_CASE("hashmap-incorrect-get")
 
     int& incorrent_get = nums_map["four"];
 
-    sc::hashmap<const char*, int> sc_nums_map {lalloc3};
+    sc::hashmap<const char*, int> sc_nums_map {halloc};
     sc_nums_map.init(3);
     sc_nums_map.put("one", 1);
     sc_nums_map.put("two", 2);

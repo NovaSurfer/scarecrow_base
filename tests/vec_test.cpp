@@ -3,35 +3,31 @@
 //
 
 #include "../heap_alloc.h"
-#include "../linear_alloc.h"
 #include "../vec.h"
 #include "doctest/doctest.h"
 #include "non_pod_struct.h"
-#include <algorithm>
-#include <vector>
 
-sc::heap_alloc halloc;
-sc::linear_alloc lalloc(halloc, sizeof(double) * 1024, alignof(double));
 
 TEST_CASE("vector-operations-pods")
 {
+    sc::heap_alloc halloc;
 
     SUBCASE("default constructor")
     {
-        sc::vec<double> v(lalloc);
+        sc::vec<double> v(halloc);
         CHECK(v.capacity() == 0);
     }
 
     SUBCASE("constructor with size")
     {
-        sc::vec<double> v(lalloc, 4);
+        sc::vec<double> v(halloc, 4);
         CHECK(v.capacity() == 4);
     }
 
     SUBCASE("constructor with size, filled with some value")
     {
         double value = 5.799;
-        sc::vec<double> v(lalloc, 4, value);
+        sc::vec<double> v(halloc, 4, value);
 
         CHECK(v.capacity() == 4);
         CHECK(v[0] == 5.799);
@@ -42,7 +38,7 @@ TEST_CASE("vector-operations-pods")
 
     SUBCASE("constructor with ref to other vector")
     {
-        sc::vec<double> v(lalloc, 10, 1.99);
+        sc::vec<double> v(halloc, 10, 1.99);
         sc::vec<double> v2(v);
         CHECK(v2.capacity() == 10);
         CHECK(v2[0] == 1.99);
@@ -54,7 +50,7 @@ TEST_CASE("vector-operations-pods")
 
     SUBCASE("constructor with lvalue ref to other vector")
     {
-        sc::vec<double> v(lalloc, 10, 1.99);
+        sc::vec<double> v(halloc, 10, 1.99);
         sc::vec<double> v2(sc::move(v));
         CHECK(v2.capacity() == 10);
         CHECK(v2[0] == 1.99);
@@ -66,8 +62,8 @@ TEST_CASE("vector-operations-pods")
 
     SUBCASE("copy assignment operator")
     {
-        sc::vec<double> v(lalloc, 5, 1.99);
-        sc::vec<double> v2(lalloc, 2, 5.0);
+        sc::vec<double> v(halloc, 5, 1.99);
+        sc::vec<double> v2(halloc, 2, 5.0);
         v2 = v;
         CHECK(v2.capacity() == 5);
         CHECK(v2[0] == 1.99);
@@ -79,8 +75,8 @@ TEST_CASE("vector-operations-pods")
 
     SUBCASE("move assignment operator")
     {
-        sc::vec<double> v(lalloc, 5, 1.99);
-        sc::vec<double> v2(lalloc, 2, 5.0);
+        sc::vec<double> v(halloc, 5, 1.99);
+        sc::vec<double> v2(halloc, 2, 5.0);
         v2 = sc::move(v);
         CHECK(v2.capacity() == 5);
         CHECK(v2[0] == 1.99);
@@ -92,7 +88,7 @@ TEST_CASE("vector-operations-pods")
 
     SUBCASE("len()")
     {
-        sc::vec<double> v(lalloc, 1, 1.1);
+        sc::vec<double> v(halloc, 1, 1.1);
         v.push(2.2);
         v.push(3.3);
         CHECK(v.len() == 3);
@@ -101,7 +97,7 @@ TEST_CASE("vector-operations-pods")
 
     SUBCASE("relen()")
     {
-        sc::vec<double> v(lalloc, 1, 1.1);
+        sc::vec<double> v(halloc, 1, 1.1);
         v.push(2.2);
         v.push(3.3);
         CHECK(v.len() == 3);
@@ -190,21 +186,19 @@ TEST_CASE("vector-operations-pods")
 
 /*************** non-pod types ***************/
 
-sc::heap_alloc halloc2;
-sc::linear_alloc lalloc2(halloc2, sizeof(NonPod) * 1024, alignof(NonPod));
-
 TEST_CASE("vector-operations-non-pods")
 {
+    sc::heap_alloc halloc2;
 
     SUBCASE("default constructor")
     {
-        sc::vec<NonPod> v(lalloc2);
+        sc::vec<NonPod> v(halloc2);
         CHECK(v.capacity() == 0);
     }
 
     SUBCASE("constructor with size")
     {
-        sc::vec<NonPod> v(lalloc2, 4);
+        sc::vec<NonPod> v(halloc2, 4);
         CHECK(v[0].val == 88.8);
         CHECK(v[1].val == 88.8);
         CHECK(v[2].val == 88.8);
@@ -215,7 +209,7 @@ TEST_CASE("vector-operations-non-pods")
     SUBCASE("constructor with size, filled with some value")
     {
         const NonPod& value = 5.799;
-        sc::vec<NonPod> v(lalloc2, 4, value);
+        sc::vec<NonPod> v(halloc2, 4, value);
         CHECK(v[0].val == 5.799);
         CHECK(v[1].val == 5.799);
         CHECK(v[2].val == 5.799);
@@ -226,7 +220,7 @@ TEST_CASE("vector-operations-non-pods")
     SUBCASE("constructor with ref to other vector")
     {
         const NonPod value {1.99};
-        sc::vec<NonPod> v(lalloc2, 10, value);
+        sc::vec<NonPod> v(halloc2, 10, value);
         sc::vec<NonPod> v2(v);
         CHECK(v2.capacity() == 10);
         CHECK(v2[0].val == 1.99);
@@ -239,7 +233,7 @@ TEST_CASE("vector-operations-non-pods")
     SUBCASE("constructor with lvalue ref to other vector")
     {
         const NonPod value {1.99};
-        sc::vec<NonPod> v(lalloc2, 10, value);
+        sc::vec<NonPod> v(halloc2, 10, value);
         sc::vec<NonPod> v2(sc::move(v));
         CHECK(v2.capacity() == 10);
         CHECK(v2[0].val == 1.99);
@@ -251,11 +245,10 @@ TEST_CASE("vector-operations-non-pods")
 
     SUBCASE("copy assignment operator")
     {
-
         const NonPod value {1.99};
         const NonPod value2 {5.0};
-        sc::vec<NonPod> v(lalloc2, 5, value);
-        sc::vec<NonPod> v2(lalloc2, 2, value2);
+        sc::vec<NonPod> v(halloc2, 5, value);
+        sc::vec<NonPod> v2(halloc2, 2, value2);
         v2 = v;
         CHECK(v2.capacity() == 5);
         CHECK(v2[0].val == 1.99);
@@ -285,7 +278,7 @@ TEST_CASE("vector-operations-non-pods")
         const NonPod value {1.1};
         NonPod value2 {2.2};
         NonPod value3 {3.3};
-        sc::vec<NonPod> v(lalloc2, 1, value);
+        sc::vec<NonPod> v(halloc2, 1, value);
         v.push(value2);
         v.push(value3);
         CHECK(v.len() == 3);
@@ -295,7 +288,7 @@ TEST_CASE("vector-operations-non-pods")
     SUBCASE("relen()")
     {
         const NonPod value {1.1};
-        sc::vec<NonPod> v(lalloc2, 1, value);
+        sc::vec<NonPod> v(halloc2, 1, value);
         v.push(2.2);
         v.push(3.3);
         CHECK(v.len() == 3);
