@@ -17,7 +17,7 @@ namespace sc
     void event_queue::write(EventType type, u32 size, void* event)
     {
         constexpr static size_t header_size = sizeof(EventHeader);
-        static size_t event_idx;
+        static size_t event_idx{};
         const size_t offset = header_size + size;
 
         EventHeader event_header{type, size};

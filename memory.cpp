@@ -89,6 +89,8 @@ namespace sc
 
     void* mem::alloc_aligned(size_t size, size_t align)
     {
+        // Possible Valgrind bug: https://bugs.kde.org/show_bug.cgi?id=474332
+        // alignment should be power of 2
         void* p_header_raw = malloc_aligned(mem::HEADER_SIZE + size, align);
 
         // construct mem_header

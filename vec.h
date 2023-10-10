@@ -161,7 +161,7 @@ namespace sc
     {
         if(capacity > space) {
 
-            T* new_data = static_cast<T*>(alloc->allocate(sizeof(T) * capacity, alignof(T)));
+            T* new_data = static_cast<T*>(alloc->allocate(sizeof(T) * capacity, alignof(T*)));
 
             if(data) {
                 for(size_t i = 0; i < size; ++i) {

@@ -163,7 +163,7 @@ namespace sc
     constexpr void hashmap<K, V>::init(size_t cap)
     {
         capacity = cap;
-        kvps = static_cast<kv_pair*>(alloc->allocate(capacity * sizeof(kv_pair), alignof(kv_pair)));
+        kvps = static_cast<kv_pair*>(alloc->allocate(capacity * sizeof(kv_pair), alignof(kv_pair*)));
         if constexpr(is_pointer_v<K>) {
             memset(kvps, 0, sizeof(kv_pair) * capacity);
         } else {
