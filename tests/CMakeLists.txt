@@ -40,6 +40,15 @@ set(TEST_SOURCES
         ../logout.h
         ../logout.cpp
         ../sc_types.h
+
+        ../ecs/component.h
+        ../ecs/ecs.cpp
+        ../ecs/ecs.h
+        ../ecs/entity.cpp
+        ../ecs/entity.h
+        ../ecs/system.cpp
+        ../ecs/system.h
+
         non_pod_struct.h
         vec_test.cpp
         hashmap_test.cpp
@@ -49,6 +58,7 @@ set(TEST_SOURCES
         shared_test.cpp
         event_queue_tests.cpp
         arena_alloc_test.cpp
+        ecs_tests.cpp
 )
 
 add_executable(sc_base_test ${TEST_SOURCES})
