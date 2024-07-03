@@ -98,7 +98,7 @@ namespace sc2d
             : components {alloc}
             , entity_to_component {alloc}
         {
-            entity_to_component.init(1);
+            entity_to_component.init(2);
         }
 
         using component_id = u32;

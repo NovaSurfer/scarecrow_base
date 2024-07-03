@@ -72,10 +72,14 @@ if (MSVC)
 #    set_source_files_properties(TEST_SOURCES PROPERTIES COMPILE_FLAGS ${MSVC_COMPILE_OPTIONS})
 else ()
     set(UNIX_COMPILE_OPTIONS "-Wall;-Wextra;-Wshadow;-Wnon-virtual-dtor;-pedantic;-Wpadded;-Winvalid-pch;-faligned-new;-O3;-g")
+    set(UNIX_COMPILE_OPTIONS_DEBUG "-O0;-Wall;-g;-fsanitize=address")
     target_compile_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:RELEASE>:${UNIX_COMPILE_OPTIONS}>")
-    target_compile_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:DEBUG>:-O0>")
+    target_compile_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:DEBUG>:${UNIX_COMPILE_OPTIONS_DEBUG}>")
     # Setting COMPILE_OPTIONS specifically for TEST_SOURCES to check for warnings library's code and test cases only
-#    set_source_files_properties(${TEST_SOURCES} PROPERTIES COMPILE_FLAGS ${UNIX_COMPILE_OPTIONS})
+    #    set_source_files_properties(${TEST_SOURCES} PROPERTIES COMPILE_FLAGS ${UNIX_COMPILE_OPTIONS})
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+      target_link_options(${PROJECT_NAME} PRIVATE -g -fsanitize=address)
+    endif()
 endif ()
 
 
