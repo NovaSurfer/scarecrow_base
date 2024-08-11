@@ -167,7 +167,7 @@ namespace sc
         if constexpr(is_pointer_v<K>) {
             memset(kvps, 0, sizeof(kv_pair) * capacity);
         } else {
-            memset(kvps, 0xffffffffU, sizeof(kv_pair) * capacity);
+            memset(kvps, 0xffU, sizeof(kv_pair) * capacity);
         }
     }
 
