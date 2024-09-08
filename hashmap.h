@@ -25,6 +25,7 @@
 #include "hash.h"
 #include "logout.h"
 #include <cassert>
+#include <cstdio>
 
 namespace sc
 {
@@ -106,30 +107,30 @@ namespace sc
 
     public:
         /**
-	 * Sets allocator.
-	 */
+         * Sets allocator.
+         */
         constexpr explicit hashmap(allocator& default_alloc);
 
         /**
-	 * Destroys map, sets size and capacity to 0.
-	 */
+         * Destroys map, sets size and capacity to 0.
+         */
         ~hashmap();
 
         /**
-	 * Allocates array of key-value pairs with a given @param capacity.
-	 */
+         * Allocates array of key-value pairs with a given @param capacity.
+         */
         constexpr void init(size_t capacity);
 
         /**
-	 * Puts key & value.
-	 * @return true on success.
-	 */
+         * Puts key & value.
+         * @return true on success.
+         */
         constexpr bool put(const K& key, const V& value);
 
         /**
-	 * Gets value by key.
-	 * @return default constructed value on fail.
-	 */
+         * Gets value by key.
+         * @return default constructed value on fail.
+         */
         V& get(const K& key) const;
         constexpr void remove(const K& key);
         [[nodiscard]] constexpr uint32_t len() const;
@@ -164,10 +165,15 @@ namespace sc
     {
         capacity = cap;
         kvps = static_cast<kv_pair*>(alloc->allocate(capacity * sizeof(kv_pair), alignof(kv_pair)));
-        if constexpr(is_pointer_v<K>) {
-            memset(kvps, 0, sizeof(kv_pair) * capacity);
+        if(kvps != nullptr) {
+            if constexpr(is_pointer_v<K>) {
+                memset(kvps, 0, sizeof(kv_pair) * capacity);
+            } else {
+                memset(kvps, 0xffU, sizeof(kv_pair) * capacity);
+            }
         } else {
-            memset(kvps, 0xffU, sizeof(kv_pair) * capacity);
+            fprintf(stderr, "allocation failed.\n");
+            exit(1);
         }
     }
 
@@ -267,6 +273,6 @@ namespace sc
     {
         return kv_iter(kvps, capacity, 0xffffffffU);
     }
-}
+} // namespace sc
 
-#endif //SC_BASE_HASHMAP_H
+#endif // SC_BASE_HASHMAP_H

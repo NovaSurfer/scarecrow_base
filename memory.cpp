@@ -6,6 +6,7 @@
 #include "compiler.h"
 #include "dbg_asserts.h"
 #include "sc_types.h"
+#include <cstdio>
 #include <new>
 
 #if SC_COMPILER_GCC || SC_COMPILER_CLANG
@@ -91,7 +92,15 @@ namespace sc
     {
         // Possible Valgrind bug: https://bugs.kde.org/show_bug.cgi?id=474332
         // alignment should be power of 2
+#    if SC_OS_OSX
+        if(align < sizeof(void*)) {
+            align = sizeof(void*);
+        }
+#    endif
         void* p_header_raw = malloc_aligned(mem::HEADER_SIZE + size, align);
+
+        fprintf(stderr, "%s - header_size: %ld\n\tsize: %ld\n\talignment: %ld\n\tpointer: %p\n",
+                __PRETTY_FUNCTION__, mem::HEADER_SIZE, size, align, p_header_raw);
 
         // construct mem_header
         construct_header(p_header_raw, size, align, mem::HEADER_FLAGS);
