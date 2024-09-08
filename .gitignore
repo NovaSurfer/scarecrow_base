@@ -55,6 +55,7 @@ game/data/sprites/private
 .DS_Store
 
 .clangd/
+.cache/
 
 # Python
 venv/
