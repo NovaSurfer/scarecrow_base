@@ -3,19 +3,19 @@
 //
 
 #include "ecs.h"
-#include "vec.h"
 #include "component.h"
 #include "entity.h"
+#include "vec.h"
 
 namespace sc2d
 {
 
     ecs::ecs(entity_manager* em, sc::heap_alloc& halloc)
-        : entt_manager {em}
-        , systems{halloc}
-        , component_managers{halloc}
-        , entity_masks{halloc}
-        , alloc{halloc}
+        : systems {halloc}
+        , component_managers {halloc}
+        , entity_masks {halloc}
+        , entt_manager {em}
+        , alloc {halloc}
     {
         entity_masks.init(2);
     }
@@ -66,4 +66,4 @@ namespace sc2d
         }
     }
 
-}
+} // namespace sc2d

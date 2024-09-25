@@ -3,6 +3,7 @@
 //
 
 #include "memory.h"
+#include "algo.h"
 #include "compiler.h"
 #include "dbg_asserts.h"
 #include "sc_types.h"
@@ -90,20 +91,20 @@ namespace sc
 
     void* mem::alloc_aligned(size_t size, size_t align)
     {
-        // Possible Valgrind bug: https://bugs.kde.org/show_bug.cgi?id=474332
-        // alignment should be power of 2
-#    if SC_OS_OSX
-        if(align < sizeof(void*)) {
-            align = sizeof(void*);
-        }
-#    endif
-        void* p_header_raw = malloc_aligned(mem::HEADER_SIZE + size, align);
+        DBG_FAIL_IF(align && ((align & (align - 1U)) != 0U), "Alignment should be power of 2");
+        align = sc::max(align, DEFAULT_ALIGNMENT);
+        // Looks like some implementations on POSIX systems could use posix_memalign for
+        // aligned_alloc under the hood, which requires alignment to be not only a power of two,
+        // but a multiple of sizeof(void*),
+        // posix_memalign alignment discussion from Rust's libstd:
+        // https://github.com/rust-lang/rust/issues/62251
+        const size_t size_with_header = mem::HEADER_SIZE + size;
+        // Size should be multiple of alignment
+        const size_t total_size = size_with_header + (size_with_header % align);
 
-        fprintf(stderr, "%s - header_size: %ld\n\tsize: %ld\n\talignment: %ld\n\tpointer: %p\n",
-                __PRETTY_FUNCTION__, mem::HEADER_SIZE, size, align, p_header_raw);
-
+        void* p_header_raw = malloc_aligned(total_size, align);
         // construct mem_header
-        construct_header(p_header_raw, size, align, mem::HEADER_FLAGS);
+        construct_header(p_header_raw, total_size - mem::HEADER_SIZE, align, mem::HEADER_FLAGS);
 
         // get & return user memory
         void* p_user = user_address(p_header_raw, mem::HEADER_SIZE);
@@ -186,7 +187,18 @@ namespace sc
 
     void* mem::alloc_aligned(size_t size, size_t align)
     {
-        return malloc_aligned(size, align);
+        // Looks like some implementations on POSIX systems could use posix_memalign for
+        // aligned_alloc under the hood, which requires alignment to be not only a power of two,
+        // but a multiple of sizeof(void*), posix_memalign alignment discussion from Rust's
+        // libstd: https://github.com/rust-lang/rust/issues/62251
+        DBG_FAIL_IF(align && ((align & (align - 1U)) != 0U), "Alignment should be power of 2");
+
+        align = sc::max(align, DEFAULT_ALIGNMENT);
+
+        // Size should be multiple of alignment
+        const size_t total_size = size + (size % align);
+
+        return malloc_aligned(total_size, align);
     }
 
     void mem::dealloc_aligned(void* ptr)

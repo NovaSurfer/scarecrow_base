@@ -24,8 +24,6 @@
 #include "dbg_asserts.h"
 #include "hash.h"
 #include "logout.h"
-#include <cassert>
-#include <cstdio>
 
 namespace sc
 {
@@ -165,15 +163,10 @@ namespace sc
     {
         capacity = cap;
         kvps = static_cast<kv_pair*>(alloc->allocate(capacity * sizeof(kv_pair), alignof(kv_pair)));
-        if(kvps != nullptr) {
-            if constexpr(is_pointer_v<K>) {
-                memset(kvps, 0, sizeof(kv_pair) * capacity);
-            } else {
-                memset(kvps, 0xffU, sizeof(kv_pair) * capacity);
-            }
+        if constexpr(is_pointer_v<K>) {
+            memset(kvps, 0, sizeof(kv_pair) * capacity);
         } else {
-            fprintf(stderr, "allocation failed.\n");
-            exit(1);
+            memset(kvps, 0xffU, sizeof(kv_pair) * capacity);
         }
     }
 

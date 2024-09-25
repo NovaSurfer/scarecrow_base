@@ -42,7 +42,8 @@ set(SC_MEM_SRC
         logout.h
         logout.cpp
         arena_alloc.cpp
-        arena_alloc.h)
+        arena_alloc.h
+        algo.h)
 #test.cpp)
 #set_source_files_properties(foo.cpp PROPERTIES COMPILE_FLAGS "-Wall" "-Werror" "-Wextra" "-Wshadow" "-Wnon-virtual-dtor" "-pedantic" "-Wpadded")
 add_library(${PROJECT_NAME} ${SC_MEM_SRC})

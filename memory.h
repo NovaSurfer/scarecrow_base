@@ -5,6 +5,7 @@
 #ifndef SC_MEMORY_H
 #define SC_MEMORY_H
 
+#include "compiler.h"
 #include "sc_types.h"
 #include <cstddef>
 
@@ -38,6 +39,12 @@ namespace sc
 
 #endif
 
+#if defined(SC_x64)
+    static constexpr const size_t DEFAULT_ALIGNMENT = 16U;
+#elif defined(SC_x32)
+    static constexpr const size_t DEFAULT_ALIGNMENT = 8U;
+#endif
+
     /**
      * Main memory allocation structure.
      * Can be used for tracking memory size & alignment when SC_ALLOC_WITH_HEADER is defined.
@@ -58,7 +65,7 @@ namespace sc
          * Allocate size bytes of uninitialized storage whose alignment is specified by alignment.
          * The size parameter must be an integral multiple of alignment.
          */
-        static void* alloc_aligned(size_t size, size_t align);
+        static void* alloc_aligned(size_t size, size_t align = DEFAULT_ALIGNMENT);
 
         /**
          * Deallocates the space previously allocated by alloc_aligned().

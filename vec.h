@@ -113,7 +113,7 @@ namespace sc
         , size(0)
         , space(0)
     {
-       *this = sc::move(other);
+        *this = sc::move(other);
     }
 
     template <typename T>
@@ -161,7 +161,7 @@ namespace sc
     {
         if(capacity > space) {
 
-            T* new_data = static_cast<T*>(alloc->allocate(sizeof(T) * capacity, alignof(T*)));
+            T* new_data = static_cast<T*>(alloc->allocate(sizeof(T) * capacity, alignof(T)));
 
             if(data) {
                 for(size_t i = 0; i < size; ++i) {
@@ -335,6 +335,6 @@ namespace sc
         return data[index];
     }
 
-}
+} // namespace sc
 
-#endif //SC_VEC_H
+#endif // SC_VEC_H

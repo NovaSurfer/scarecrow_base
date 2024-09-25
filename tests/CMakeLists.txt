@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-#add_definitions("-DSC_ALLOC_WITH_HEADER")
+add_definitions("-DSC_ALLOC_WITH_HEADER")
 
 set(TEST_SOURCES
         unit.cpp
@@ -40,6 +40,7 @@ set(TEST_SOURCES
         ../logout.h
         ../logout.cpp
         ../sc_types.h
+        ../algo.h
 
         ../ecs/component.h
         ../ecs/ecs.cpp
@@ -49,15 +50,15 @@ set(TEST_SOURCES
         ../ecs/system.cpp
         ../ecs/system.h
 
-#        non_pod_struct.h
-#        vec_test.cpp
-#       hashmap_test.cpp
-#        arr_test.cpp
-#        queue_test.cpp
-#        unique_test.cpp
-#        shared_test.cpp
-#        event_queue_tests.cpp
-#        arena_alloc_test.cpp
+        non_pod_struct.h
+        vec_test.cpp
+        hashmap_test.cpp
+        arr_test.cpp
+        queue_test.cpp
+        unique_test.cpp
+        shared_test.cpp
+        event_queue_tests.cpp
+        arena_alloc_test.cpp
         ecs_tests.cpp
 )
 
