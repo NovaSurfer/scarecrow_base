@@ -10,23 +10,33 @@
 TEST_CASE("entity-generation-stress")
 {
     sc::heap_alloc ha;
-    //    sc::linear_alloc linear_allocator(ha, 5120, alignof(void*));
     sc2d::entity_manager em(ha);
     sc2d::ecs ecs(&em, ha);
 
     for(size_t i = 0; i < 1024; ++i)
     {
        auto a = ecs.create_entity();
+       REQUIRE_EQ(em.alive(a), true);
        ecs.destroy_entity(a);
     }
-    //    MESSAGE(linear_allocator.total_allocated());
-    //    MESSAGE(linear_allocator.get_free_size());
+}
+
+TEST_CASE("entity-generation-free-indices-overrun")
+{
+    sc::heap_alloc ha;
+    sc2d::entity_manager em(ha);
+    sc2d::ecs ecs(&em, ha);
+
+    for(size_t i = 0; i < 2048; ++i)
+    {
+       auto a = ecs.create_entity();
+       ecs.destroy_entity(a);
+    }
 }
 
 TEST_CASE("entity-create-delete")
 {
     sc::heap_alloc ha;
-    //    sc::linear_alloc linear_allocator(ha, 1024, alignof(void*));
     sc2d::entity_manager em(ha);
     sc2d::ecs ecs(&em, ha);
 
