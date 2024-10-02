@@ -58,7 +58,7 @@ namespace sc2d
 
     void entity_manager::destroy(entity e)
     {
-        const u32 idx = e.id;
+        const u32 idx = e.index();
         ++generation[idx];
         free_indices.push(idx);
     }
