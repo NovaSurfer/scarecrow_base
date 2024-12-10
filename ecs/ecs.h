@@ -6,10 +6,10 @@
 #define SCARECROW2D_ECS_H
 
 #include "allocator.h"
-#include "hashmap.h"
-#include "heap_alloc.h"
 #include "component.h"
 #include "entity.h"
+#include "hashmap.h"
+#include "heap_alloc.h"
 #include "system.h"
 #include <climits>
 
@@ -68,6 +68,10 @@ namespace sc2d
         component_manager<Component>* cm = get_component_manager<Component>();
         cm->destroy(e);
 
+        if(cm->components.empty()) {
+            alloc.make_delete(cm);
+        }
+
         component_mask old_mask = entity_masks.get(e.id);
         entity_masks.get(e.id).remove_component<Component>();
         update_entity_mask(e, old_mask);
@@ -80,12 +84,13 @@ namespace sc2d
         if(id >= component_managers.len()) {
             component_managers.resize(id + 1);
 
-            component_manager<Component>* new_manager = alloc.make_new<component_manager<Component>>(alloc);
+            component_manager<Component>* new_manager =
+                alloc.make_new<component_manager<Component>>(alloc);
             component_managers[id] = new_manager;
         }
 
         return static_cast<component_manager<Component>*>(component_managers[id]);
     }
-}
+} // namespace sc2d
 
-#endif //SCARECROW2D_ECS_H
+#endif // SCARECROW2D_ECS_H
