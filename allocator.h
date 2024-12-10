@@ -25,7 +25,7 @@ namespace sc
         template <typename T, typename... TArgs>
         T* make_new(TArgs&&... args);
         template <typename T>
-        void make_delete(const T* ptr);
+        void make_delete(T* ptr);
 
         allocator() = default;
         allocator(const allocator&) = delete;
@@ -41,7 +41,7 @@ namespace sc
     }
 
     template <typename T>
-    void allocator::make_delete(const T* ptr)
+    void allocator::make_delete(T* ptr)
     {
         if(ptr) {
             ptr->~T();
