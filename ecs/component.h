@@ -7,10 +7,10 @@
 
 #include "allocator.h"
 #include "dbg_asserts.h"
+#include "entity.h"
 #include "hashmap.h"
 #include "sc_types.h"
 #include "vec.h"
-#include "entity.h"
 #include <algorithm>
 #include <cassert>
 #include <queue>
@@ -110,9 +110,9 @@ namespace sc2d
         u16 add(entity e, Component c)
         {
             log_info_cmd("Adding component: %d to an entity: %d", Component::id(), e.id);
-            u16 instance = components.len();
+            const u16 instance = c.id();
             components.push(c);
-            entity_to_component.put(e, Component::id());
+            entity_to_component.put(e, instance);
             return instance;
         }
 
@@ -122,14 +122,16 @@ namespace sc2d
             component_id instance = entity_to_component.get(e);
             entity_to_component.remove(e);
 
-            const size_t len = components.len();
-            for(size_t i = 0; i < len; ++i) {
+            for(size_t i = 0, len = components.len(); i < len; ++i) {
                 if(components[i].id() == instance) {
                     log_info_cmd("Component removed");
                     if(len > 1) {
                         sc::swap(components[len - 1], components[i]);
+                        components.pop_back();
+                        --len;
                     } else {
                         components.pop_back();
+                        --len;
                     }
                 }
             }
@@ -141,6 +143,6 @@ namespace sc2d
         //            return components[instance];
         //        }
     };
-}
+} // namespace sc2d
 
-#endif //SCARECROW2D_COMPONENT_H
+#endif // SCARECROW2D_COMPONENT_H
