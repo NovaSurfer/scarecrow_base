@@ -68,7 +68,7 @@ namespace sc2d
         component_manager<Component>* cm = get_component_manager<Component>();
         cm->destroy(e);
 
-        if(cm->components.empty()) {
+        if(cm->is_empty()) {
             alloc.make_delete(cm);
         }
 

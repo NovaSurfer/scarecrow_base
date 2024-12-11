@@ -11,12 +11,12 @@
 #include "hashmap.h"
 #include "sc_types.h"
 #include "vec.h"
-#include <algorithm>
 #include <cassert>
-#include <queue>
 
 namespace sc2d
 {
+
+    static constexpr const size_t MAX_COMPONENETS_PER_ENTITY = 16;
 
     struct component_id
     {
@@ -48,12 +48,12 @@ namespace sc2d
             mask &= ~(1 << Component::id());
         }
 
-        constexpr bool is_new_match(component_mask old_mask, component_mask sys_mask)
+        constexpr bool is_new_match(component_mask old_mask, component_mask sys_mask) const
         {
             return matches(sys_mask) && !old_mask.matches(sys_mask);
         }
 
-        constexpr bool no_longer_matched(component_mask old_mask, component_mask sys_mask)
+        constexpr bool no_longer_matched(component_mask old_mask, component_mask sys_mask) const
         {
             return (old_mask.matches(sys_mask) && !matches(sys_mask));
         }
@@ -67,51 +67,51 @@ namespace sc2d
         u16 mask = 0;
     };
 
-    struct any_component
-    {
-        template <typename AnyComponent>
-        explicit constexpr any_component(AnyComponent* any_type)
-            : type {any_type}
-            , component_id {any_type->id()}
-        { }
-
-        template <typename AnyComponent>
-        constexpr AnyComponent* get()
+    /*
+        struct any_component
         {
-            DBG_FAIL_IF(AnyComponent::id() != component_id,
-                        "Stored component ID != Component ID to cast")
-            return static_cast<AnyComponent*>(type);
-        }
+            template <typename AnyComponent>
+            explicit constexpr any_component(AnyComponent* any_type)
+                : type {any_type}
+                , component_id {any_type->id()}
+            { }
 
-    private:
-        void* type;
-        u16 component_id;
-    };
+            template <typename AnyComponent>
+            constexpr AnyComponent* get()
+            {
+                DBG_FAIL_IF(AnyComponent::id() != component_id,
+                            "Stored component ID != Component ID to cast")
+                return static_cast<AnyComponent*>(type);
+            }
 
-    struct any_component_manager
+        private:
+            void* type;
+            u16 component_id;
+        };
+    */
+
+    class any_component_manager
     { };
 
     template <typename Component>
-    struct component_manager : any_component_manager
+    class component_manager : public any_component_manager
     {
-        explicit component_manager(sc::allocator& alloc)
-            : components {alloc}
-            , entity_to_component {alloc}
-        {
-            entity_to_component.init(2);
-        }
 
         using component_id = u32;
-        // TODO: SoA
-        sc::vec<Component> components;
-        // <entity_id, component_id>
-        sc::hashmap<entity, component_id> entity_to_component;
+
+    public:
+        explicit component_manager(sc::allocator& alloc)
+            : component_instancies {alloc}
+            , entity_to_component {alloc}
+        {
+            entity_to_component.init(MAX_COMPONENETS_PER_ENTITY);
+        }
 
         u16 add(entity e, Component c)
         {
             log_info_cmd("Adding component: %d to an entity: %d", Component::id(), e.id);
-            const u16 instance = c.id();
-            components.push(c);
+            const u16 instance = component_instancies.len();
+            component_instancies.push(c);
             entity_to_component.put(e, instance);
             return instance;
         }
@@ -119,22 +119,17 @@ namespace sc2d
         void destroy(entity e)
         {
             log_info_cmd("Destroying component: %d from an entity: %d", Component::id(), e.id);
-            component_id instance = entity_to_component.get(e);
+            const component_id instance = entity_to_component.get(e);
             entity_to_component.remove(e);
 
-            for(size_t i = 0, len = components.len(); i < len; ++i) {
-                if(components[i].id() == instance) {
-                    log_info_cmd("Component removed");
-                    if(len > 1) {
-                        sc::swap(components[len - 1], components[i]);
-                        components.pop_back();
-                        --len;
-                    } else {
-                        components.pop_back();
-                        --len;
-                    }
-                }
-            }
+            const size_t instancies_size = component_instancies.len();
+            sc::swap(component_instancies[instancies_size - 1], component_instancies[instance]);
+            component_instancies.pop_back();
+        }
+
+        constexpr bool is_empty() const
+        {
+            return component_instancies.empty();
         }
 
         //        Component& get(entity e)
@@ -142,6 +137,12 @@ namespace sc2d
         //            Component instance = entity_to_component[e.id];
         //            return components[instance];
         //        }
+
+    private:
+        // TODO: SoA
+        sc::vec<Component> component_instancies;
+        // <entity_id, component_id>
+        sc::hashmap<entity, component_id> entity_to_component;
     };
 } // namespace sc2d
 
