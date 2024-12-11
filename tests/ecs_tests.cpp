@@ -78,4 +78,45 @@ TEST_CASE("single-entity-multiple-components")
     ecs.destroy_entity(e);
 }
 
-TEST_CASE("multiple-entities-multiple-components") { }
+TEST_CASE("multiple-entities-multiple-components")
+{
+    sc::heap_alloc ha;
+    sc2d::entity_manager em(ha);
+    sc2d::ecs ecs(&em, ha);
+
+    sc2d::entity e1 = ecs.create_entity();
+    sc2d::entity e2 = ecs.create_entity();
+    sc2d::entity e3 = ecs.create_entity();
+
+    first_cmpt cmpt_1;
+    second_cmpt cmpt_2;
+    third_cmpt cmpt_3;
+
+    ecs.add_component(e1, cmpt_1);
+    ecs.add_component(e2, cmpt_1);
+    ecs.add_component(e3, cmpt_1);
+
+    ecs.add_component(e1, cmpt_2);
+    ecs.add_component(e2, cmpt_2);
+    ecs.add_component(e3, cmpt_2);
+
+    ecs.add_component(e1, cmpt_3);
+    ecs.add_component(e2, cmpt_3);
+    ecs.add_component(e3, cmpt_3);
+
+    ecs.remove_component<first_cmpt>(e1);
+    ecs.remove_component<first_cmpt>(e2);
+    ecs.remove_component<first_cmpt>(e3);
+    
+    ecs.remove_component<second_cmpt>(e1);
+    ecs.remove_component<second_cmpt>(e2);
+    ecs.remove_component<second_cmpt>(e3);
+    
+    ecs.remove_component<third_cmpt>(e1);
+    ecs.remove_component<third_cmpt>(e2);
+    ecs.remove_component<third_cmpt>(e3);
+
+    ecs.destroy_entity(e1);
+    ecs.destroy_entity(e2);
+    ecs.destroy_entity(e3);
+}
