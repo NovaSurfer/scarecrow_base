@@ -41,6 +41,8 @@ set(TEST_SOURCES
         ../logout.cpp
         ../sc_types.h
         ../algo.h
+        ../bitset64.h
+        ../bitset64.cpp
 
         ../ecs/component.h
         ../ecs/ecs.cpp
@@ -60,6 +62,7 @@ set(TEST_SOURCES
         event_queue_tests.cpp
         arena_alloc_test.cpp
         ecs_tests.cpp
+        bitset_test.cpp
 )
 
 add_executable(sc_base_test ${TEST_SOURCES})
