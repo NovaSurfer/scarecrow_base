@@ -9,15 +9,18 @@
 #ifndef SC_TYPETRAITS_H
 #define SC_TYPETRAITS_H
 
+#include "compiler.h"
+
 namespace sc
 {
 
     using nullptr_t = decltype(nullptr);
 
-    /** 
+    /**
      * Is Trivial
      * Reference: https://clang.llvm.org/docs/LanguageExtensions.html#type-trait-primitives
-     * The compiler intrinsic "__is_is_trivial" provide type information that is otherwise unavailable.
+     * The compiler intrinsic "__is_is_trivial" provide type information that is otherwise
+     * unavailable.
      */
     template <typename T>
     inline constexpr bool is_trivial_v = __is_trivial(T);
@@ -40,11 +43,47 @@ namespace sc
     template <typename T>
     inline constexpr bool is_pointer_v<T* const volatile> = true;
 
-    template<bool B, typename T, typename F>
-    struct conditional { typedef T type; };
+    template <bool B, typename T, typename F>
+    struct conditional
+    {
+        typedef T type;
+    };
 
-    template<typename T, typename F>
-    struct conditional<false, T, F> { typedef F type; };
+    template <typename T, typename F>
+    struct conditional<false, T, F>
+    {
+        typedef F type;
+    };
+
+    /**
+     * Remove const volatile from type
+     */
+    template <typename T>
+    struct remove_const_volatile
+    {
+        using type = T;
+    };
+
+    template <typename T>
+    struct remove_const_volatile<const T>
+    {
+        using type = T;
+    };
+
+    template <typename T>
+    struct remove_const_volatile<volatile T>
+    {
+        using type = T;
+    };
+
+    template <typename T>
+    struct remove_const_volatile<const volatile T>
+    {
+        using type = T;
+    };
+
+    template <typename T>
+    using remove_const_volatile_t = typename remove_const_volatile<T>::type;
 
     /**
      * Remove reference
@@ -67,6 +106,38 @@ namespace sc
         using type = T;
     };
 
+    template <typename T>
+    using remove_reference_t = typename remove_reference<T>::type;
+
+#ifdef SC_COMPILER_GCC_OR_CLANG
+    template <typename T1, typename T2>
+    constexpr bool is_same_v = __is_same_as(T1, T2);
+#else
+    template <typename T1, typename T2>
+    constexpr bool is_same_v = false;
+
+    template <typename T>
+    constexpr bool is_same_v<T, T> = true;
+#endif
+
+    template <typename T, typename... Types>
+    constexpr bool is_any_of_v = (is_same_v<T, Types> || ...);
+
+    template <typename T>
+    constexpr bool is_integral_v =
+        is_any_of_v<remove_const_volatile_t<T>, bool, char, signed char, unsigned char, wchar_t,
+#ifdef __cpp_char8_t // CXX20
+                    char8_t,
+#endif
+                    char16_t, char32_t, short, unsigned short, int, unsigned int, long,
+                    unsigned long, long long, unsigned long long>;
+
+#define SC_requires_unsigned(T)                                                                    \
+    static_assert(is_integral_v<T> && T(-1) > T(0), "Expecting integral unsigned type.")
+
+#define SC_requires_signed(T)                                                                      \
+    static_assert(is_integral_v<T> && T(-1) < T(0), "Expecting integral signed type.");
+
     /* Implementing MOVE and FORWARD
      * Reference: https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/bits/move.h
      * https://eli.thegreenplace.net/2014/perfect-forwarding-and-universal-references-in-c
@@ -77,9 +148,9 @@ namespace sc
      * @return the parameter cast to an rvalue-reference to allow moving it.
      */
     template <class T>
-    [[nodiscard]] constexpr typename remove_reference<T>::type&& move(T&& _Arg) noexcept
+    [[nodiscard]] constexpr remove_reference_t<T>&& move(T&& _Arg) noexcept
     {
-        return static_cast<typename remove_reference<T>::type&&>(_Arg);
+        return static_cast<remove_reference_t<T>&&>(_Arg);
     }
 
     /**
@@ -87,7 +158,7 @@ namespace sc
      * @return the parameter cast to specified type.
      */
     template <typename T>
-    constexpr T&& forward(typename remove_reference<T>::type& t) noexcept
+    constexpr T&& forward(remove_reference_t<T>& t) noexcept
     {
         return static_cast<T&&>(t);
     }
@@ -97,7 +168,7 @@ namespace sc
      * @return the parameter cast to specified type.
      */
     template <typename T>
-    constexpr T&& forward(typename remove_reference<T>::type&& t) noexcept
+    constexpr T&& forward(remove_reference_t<T>&& t) noexcept
     {
         return static_cast<T&&>(t);
     }
@@ -109,7 +180,6 @@ namespace sc
         t1 = move(t2);
         t2 = move(temp);
     }
-
 
     template <typename Base, typename Member>
     class compressed_pair : private Base
@@ -136,6 +206,6 @@ namespace sc
         Member member;
     };
 
-}
+} // namespace sc
 
-#endif //SC_TYPETRAITS_H
+#endif // SC_TYPETRAITS_H
