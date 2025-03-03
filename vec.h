@@ -5,11 +5,10 @@
 #ifndef SC_VEC_H
 #define SC_VEC_H
 
+#include "allocator.h"
 #include "typeutils.h"
 #include <cstddef>
 #include <cstring>
-
-struct allocator;
 
 namespace sc
 {
@@ -25,7 +24,6 @@ namespace sc
         constexpr vec(vec&& other) noexcept;
         ~vec();
 
-        // TODO:
         constexpr vec<T>& operator=(const vec<T>& v);
         constexpr vec<T>& operator=(vec<T>&& v);
 
@@ -185,6 +183,10 @@ namespace sc
     template <typename T>
     void vec<T>::resize(size_t new_size)
     {
+        if(new_size == size) {
+            return;
+        }
+
         if(new_size > size) {
             reserve(new_size);
             if constexpr(!is_trivial_v<T>) {

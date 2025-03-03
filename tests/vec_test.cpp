@@ -7,7 +7,6 @@
 #include "doctest/doctest.h"
 #include "non_pod_struct.h"
 
-
 TEST_CASE("vector-operations-pods")
 {
     sc::heap_alloc halloc;
@@ -118,6 +117,13 @@ TEST_CASE("vector-operations-pods")
 
         // Decreasing size
         v.resize(2);
+        CHECK(v[0] == 1.1);
+        CHECK(v[1] == 2.2);
+
+        // Resizing with the same size
+        v.resize(2);
+        CHECK(v.len() == 2);
+        CHECK(v.capacity() == 10);
         CHECK(v[0] == 1.1);
         CHECK(v[1] == 2.2);
     }
@@ -309,6 +315,13 @@ TEST_CASE("vector-operations-non-pods")
         CHECK(v.len() == 8);
 
         // Decreasing size
+        v.resize(2);
+        CHECK(v.len() == 2);
+        CHECK(v.capacity() == 10);
+        CHECK(v[0].val == 1.1);
+        CHECK(v[1].val == 2.2);
+
+        // Resizing with the same size
         v.resize(2);
         CHECK(v.len() == 2);
         CHECK(v.capacity() == 10);
