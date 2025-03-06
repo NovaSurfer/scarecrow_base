@@ -7,6 +7,7 @@
 #include "compiler.h"
 #include "dbg_asserts.h"
 #include "sc_types.h"
+#include <cstddef>
 #include <cstdio>
 #include <new>
 
@@ -23,6 +24,16 @@
 
 namespace sc
 {
+
+    constexpr sc_forceinline size_t get_multiple_of_alignment(size_t size, size_t alignment)
+    {
+        size_t a = alignment - 1;
+        if(size & a) {
+            return size + (alignment - (size & a));
+        }
+
+        return size;
+    }
 
 #if defined(SC_ALLOC_WITH_HEADER) /* ------------------------------------------ */
 
@@ -100,7 +111,7 @@ namespace sc
         // https://github.com/rust-lang/rust/issues/62251
         const size_t size_with_header = mem::HEADER_SIZE + size;
         // Size should be multiple of alignment
-        const size_t total_size = size_with_header + (size_with_header % align);
+        const size_t total_size = get_multiple_of_alignment(size_with_header, align);
 
         void* p_header_raw = malloc_aligned(total_size, align);
         // construct mem_header
@@ -196,7 +207,7 @@ namespace sc
         align = sc::max(align, DEFAULT_ALIGNMENT);
 
         // Size should be multiple of alignment
-        const size_t total_size = size + (size % align);
+        const size_t total_size = get_multiple_of_alignment(size_with_header, align);
 
         return malloc_aligned(total_size, align);
     }
