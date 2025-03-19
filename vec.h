@@ -117,7 +117,11 @@ namespace sc
     template <typename T>
     vec<T>::~vec()
     {
-        clear();
+        if(alloc && data) {
+            clear();
+            alloc->deallocate(data);
+            space = 0;
+        }
     }
 
     template <typename T>
@@ -125,7 +129,7 @@ namespace sc
     {
         if(this != &o) {
             // if alloc differs
-            clear();
+            this->~vec();
             if(alloc != o.alloc) {
                 alloc = o.alloc;
             }
@@ -143,7 +147,7 @@ namespace sc
     template <typename T>
     constexpr vec<T>& vec<T>::operator=(vec<T>&& o)
     {
-        clear();
+        this->~vec();
         space = o.space;
         size = o.size;
         alloc = o.alloc;
@@ -209,7 +213,11 @@ namespace sc
     template <typename T>
     void vec<T>::shrink_to_fit()
     {
-        if(space > size) {
+        if(space < size) {
+            return;
+        }
+
+        if(size) {
             T* new_data = (T*)alloc->allocate(sizeof(T) * size, alignof(T));
 
             if constexpr(!is_trivial_v<T>) {
@@ -227,10 +235,12 @@ namespace sc
             }
 
             alloc->deallocate(data);
-
             data = new_data;
-            space = size;
+
+        } else {
+            alloc->deallocate(data);
         }
+        space = size;
     }
 
     template <typename T>
@@ -251,10 +261,7 @@ namespace sc
             }
         }
 
-        if(alloc) {
-            alloc->deallocate(data);
-        }
-        size = space = 0;
+        size = 0;
     }
 
     template <typename T>
