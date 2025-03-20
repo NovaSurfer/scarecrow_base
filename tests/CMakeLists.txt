@@ -43,6 +43,7 @@ set(TEST_SOURCES
         ../algo.h
         ../bitset64.h
         ../bitset64.cpp
+        ../sparse_set.h
 
         ../ecs/component.h
         ../ecs/ecs.cpp
@@ -63,6 +64,7 @@ set(TEST_SOURCES
         arena_alloc_test.cpp
         ecs_tests.cpp
         bitset_test.cpp
+        sparse_set_tests.cpp
 )
 
 add_executable(sc_base_test ${TEST_SOURCES})
