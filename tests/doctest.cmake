@@ -1,7 +1,8 @@
 
 include(FetchContent)
 FetchContent_Declare(doctest
-        GIT_REPOSITORY https://github.com/doctest/doctest.git)
+        GIT_REPOSITORY https://github.com/doctest/doctest.git
+        GIT_TAG dev)
 FetchContent_MakeAvailable(doctest)
 
 if(NOT doctest_SOURCE_DIR)
