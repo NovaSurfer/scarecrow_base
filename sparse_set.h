@@ -5,7 +5,6 @@
 #ifndef SC_SPARSE_SET_H
 #define SC_SPARSE_SET_H
 
-#include "dbg_asserts.h"
 #include "typeutils.h"
 #include "vec.h"
 
@@ -25,9 +24,10 @@ namespace sc
         constexpr void add(T item);
         constexpr bool remove(T item);
         constexpr const vec<T>& get_dense() const;
+        constexpr size_t get_item_index(T item) const;
 
         constexpr void resize(size_t new_size);
-        //constexpr void shrink_to_fit();
+        // constexpr void shrink_to_fit();
         constexpr void clear();
 
         constexpr bool has(T item) const;
@@ -65,7 +65,7 @@ namespace sc
     template <typename T>
     constexpr bool sparse_set<T>::remove(T item)
     {
-        if(!has(item)) {
+        if(item >= sparse.capacity() && !has(item)) {
             return false;
         }
 
@@ -95,7 +95,7 @@ namespace sc
     {
         return dense;
     }
-    
+
     template <typename T>
     constexpr void sparse_set<T>::resize(size_t new_size)
     {
@@ -103,8 +103,7 @@ namespace sc
         sparse.resize(new_size);
     }
 
-
-	// TODO: fix + uncomment test case
+    // TODO: fix + uncomment test case
     // template <typename T>
     // constexpr void sparse_set<T>::shrink_to_fit()
     // {
@@ -122,7 +121,10 @@ namespace sc
     template <typename T>
     constexpr bool sparse_set<T>::has(T item) const
     {
-        if(item >= sparse.capacity()) {
+        // Using .len() instead of .capacity() because sparse_set can be used after .clean().
+        // I want to avoid accessing uninitialized memory,
+        // as Valgrind reports: "Conditional jump or move depends on uninitialized value."
+        if(item >= sparse.len()) {
             return false;
         }
 
@@ -136,15 +138,28 @@ namespace sc
     {
         return dense.empty();
     }
+
     template <typename T>
     constexpr size_t sparse_set<T>::len() const
     {
         return dense.len();
     }
+
     template <typename T>
     constexpr size_t sparse_set<T>::capacity() const
     {
         return dense.capacity();
+    }
+
+    // TODO: write test
+    template <typename T>
+    constexpr size_t sparse_set<T>::get_item_index(T item) const
+    {
+        if(item >= sparse.capacity()) {
+            return size_t(-1);
+        }
+
+        return sparse[item];
     }
 
 } // namespace sc

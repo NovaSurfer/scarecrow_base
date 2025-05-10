@@ -9,6 +9,7 @@
 #include "typeutils.h"
 #include <cstddef>
 #include <cstring>
+#include <new>
 
 namespace sc
 {
@@ -274,7 +275,7 @@ namespace sc
             reserve(space * vec::GROWTH_FACTOR);
         }
 
-        data[size] = item;
+        ::new(data + size) T(item);
         ++size;
     }
 
