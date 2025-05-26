@@ -10,6 +10,7 @@
 #define SC_TYPETRAITS_H
 
 #include "compiler.h"
+#include "sc_types.h"
 
 namespace sc
 {
@@ -205,6 +206,34 @@ namespace sc
     private:
         Member member;
     };
+
+    template <typename T, T... Values>
+    struct integer_sequence
+    {
+        static_assert(is_integral_v<T>,
+                      "integer_sequence<T, I...> requires T to be an integral type.");
+
+        using value_type = T;
+
+        [[nodiscard]] static constexpr size_t size() noexcept
+        {
+            return sizeof...(Values);
+        }
+    };
+
+    template <typename T, T Size>
+    using make_integer_sequence
+#if __has_builtin(__make_integer_seq)
+        = __make_integer_seq<integer_sequence, T, Size>;
+#else
+        = integer_sequence<T, __integer_pack(Size)...>;
+#endif
+
+    template <size_t... Values>
+    using index_sequence = integer_sequence<size_t, Values...>;
+
+    template <size_t Size>
+    using make_index_sequence = make_integer_sequence<size_t, Size>;
 
 } // namespace sc
 
