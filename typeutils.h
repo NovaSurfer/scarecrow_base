@@ -225,6 +225,8 @@ namespace sc
     using make_integer_sequence
 #if __has_builtin(__make_integer_seq)
         = __make_integer_seq<integer_sequence, T, Size>;
+#elif defined(_MSC_VER)
+        = __make_integer_seq<integer_sequence, T, Size>;
 #else
         = integer_sequence<T, __integer_pack(Size)...>;
 #endif
