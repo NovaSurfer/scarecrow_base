@@ -25,8 +25,8 @@ namespace sc
         constexpr vec(vec&& other) noexcept;
         ~vec();
 
-        constexpr vec<T>& operator=(const vec<T>& v);
-        constexpr vec<T>& operator=(vec<T>&& v);
+        constexpr vec<T>& operator=(const vec<T>& o);
+        constexpr vec<T>& operator=(vec<T>&& o) noexcept;
 
         void reserve(size_t capacity);
         void resize(size_t new_size);
@@ -146,7 +146,7 @@ namespace sc
     }
 
     template <typename T>
-    constexpr vec<T>& vec<T>::operator=(vec<T>&& o)
+    constexpr vec<T>& vec<T>::operator=(vec<T>&& o) noexcept
     {
         this->~vec();
         space = o.space;
