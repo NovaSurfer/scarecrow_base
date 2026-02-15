@@ -3,7 +3,6 @@
 //
 
 #include "event_queue.h"
-#include "heap_alloc.h"
 
 namespace sc
 {
