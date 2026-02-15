@@ -45,7 +45,6 @@ namespace sc
             K key;
             V value;
 
-        private:
             uint32_t dib;
         };
 
