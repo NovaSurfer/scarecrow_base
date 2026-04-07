@@ -15,6 +15,10 @@
 namespace sc
 {
 
+    #ifndef __has_builtin
+#    define __has_builtin(x) 0
+    #endif
+
     using nullptr_t = decltype(nullptr);
 
     template <typename...>
@@ -174,13 +178,23 @@ namespace sc
 #define SC_requires_signed(T)                                                                      \
     static_assert(is_integral_v<T> && T(-1) < T(0), "Expecting integral signed type.");
 
+#if __has_builtin(__is_const)
     template <typename T>
     inline constexpr bool is_const_v = __is_const(T);
+#else
+    template <typename T>
+    inline constexpr bool is_const_v = false;
+
+    template <typename T>
+    inline constexpr bool is_const_v<const T> = true;
+#endif
 
     template <typename T>
     inline constexpr bool is_trivially_destructible_v =
 #if __has_builtin(__is_trivially_destructible)
         __is_trivially_destructible(T);
+#elif defined(_MSC_VER)
+        __has_trivial_destructor(T);
 #elif __has_builtin(__has_trivial_destructor)
         __has_trivial_destructor(T);
 #else

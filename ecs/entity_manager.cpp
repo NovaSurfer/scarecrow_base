@@ -49,4 +49,4 @@ u32 sc::hash<>(entity key)
 }
 
 template <>
-sc::entity sc::DEFVAL<sc::entity> {entity {0xffffffffU}};
+sc::entity sc::DEFVAL<sc::entity> {sc::entity {0xffffffffU}};
