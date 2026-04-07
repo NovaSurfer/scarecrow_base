@@ -44,14 +44,14 @@ set(TEST_SOURCES
         ../bitset64.h
         ../bitset64.cpp
         ../sparse_set.h
+        ../tuple.h
 
         ../ecs/component.h
         ../ecs/ecs.cpp
         ../ecs/ecs.h
-        ../ecs/entity.cpp
         ../ecs/entity.h
-        ../ecs/system.cpp
-        ../ecs/system.h
+        ../ecs/entity_manager.h
+        ../ecs/entity_manager.cpp
 
         non_pod_struct.h
         vec_test.cpp
@@ -65,6 +65,8 @@ set(TEST_SOURCES
         ecs_tests.cpp
         bitset_test.cpp
         sparse_set_tests.cpp
+        typetraits_tests.cpp
+        tuple_test.cpp
 )
 
 add_executable(sc_base_test ${TEST_SOURCES})

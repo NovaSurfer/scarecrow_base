@@ -46,7 +46,13 @@ set(SC_MEM_SRC
         algo.h
         bitset64.h
         bitset64.cpp
-        sparse_set.h)
+        sparse_set.h
+
+        ecs/component.h
+        ecs/ecs.cpp
+        ecs/ecs.h
+        ecs/entity.h)
+        #ecs/system.h
 #test.cpp)
 #set_source_files_properties(foo.cpp PROPERTIES COMPILE_FLAGS "-Wall" "-Werror" "-Wextra" "-Wshadow" "-Wnon-virtual-dtor" "-pedantic" "-Wpadded")
 add_library(${PROJECT_NAME} ${SC_MEM_SRC})
