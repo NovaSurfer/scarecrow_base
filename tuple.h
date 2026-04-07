@@ -108,7 +108,7 @@ namespace sc
 
     private:
         template <size_t>
-        static constexpr inline bool tuple_always_false = false;
+        static constexpr bool tuple_always_false = false;
 
         struct member_info
         {
@@ -176,122 +176,6 @@ namespace sc
         alignas(sc::max_value(alignof(T)...)) uchar storage[(sizeof(T) + ...)];
     };
 
-    // template <size_t I, typename T>
-    // struct tuple_leaf
-    // {
-    //     T value;
-
-    //     constexpr tuple_leaf() = default;
-
-    //     template <class U>
-    //     constexpr tuple_leaf(U&& v)
-    //         : value(sc::forward<U>(v))
-    //     { }
-
-    //     constexpr T& get() & noexcept
-    //     {
-    //         return value;
-    //     }
-
-    //     constexpr const T& get() const& noexcept
-    //     {
-    //         return value;
-    //     }
-
-    //     constexpr T&& get() && noexcept
-    //     {
-    //         return static_cast<T&&>(value);
-    //     }
-
-    //     constexpr const T&& get() const&& noexcept
-    //     {
-    //         return static_cast<const T&&>(value);
-    //     }
-    // };
-
-    // template <size_t I, typename T>
-    // struct tuple_leaf<I, T&>
-    // {
-    //     T* ptr = nullptr;
-
-    //     tuple_leaf() = default;
-    //     constexpr tuple_leaf(T& ref)
-    //         : ptr(&ref)
-    //     { }
-
-    //     constexpr T& get() const noexcept
-    //     {
-    //         return *ptr;
-    //     }
-    // };
-
-    // template <class Seq, class... Ts>
-    // struct tuple_impl;
-
-    // template <size_t... Is, typename... Ts>
-    // struct tuple_impl<index_sequence<Is...>, Ts...> : tuple_leaf<Is, Ts>...
-    // {
-    //     constexpr tuple_impl() = default;
-
-    //     template <class... Us>
-    //     constexpr tuple_impl(Us&&... args)
-    //         : tuple_leaf<Is, Ts>(sc::forward<Us>(args))...
-    //     { }
-    // };
-
-    // template <class... Ts>
-    // class tuple_leaf_based : public tuple_impl<make_index_sequence<sizeof...(Ts)>, Ts...>
-    // {
-    //     using base = tuple_impl<make_index_sequence<sizeof...(Ts)>, Ts...>;
-
-    // public:
-    //     using base::base;
-
-    //     template <std::size_t I>
-    //     constexpr decltype(auto) get() & noexcept
-    //     {
-    //         using Leaf = tuple_leaf<I, type_at_t<I, Ts...>>;
-    //         return static_cast<Leaf&>(*this).get();
-    //     }
-
-    //     template <size_t I>
-    //     constexpr decltype(auto) get() const& noexcept
-    //     {
-    //         using Leaf = tuple_leaf<I, type_at_t<I, Ts...>>;
-    //         return static_cast<const Leaf&>(*this).get();
-    //     }
-
-    //     template <size_t I>
-    //     constexpr decltype(auto) get() && noexcept
-    //     {
-    //         using Leaf = tuple_leaf<I, type_at_t<I, Ts...>>;
-    //         return sc::move(static_cast<Leaf&>(*this)).get();
-    //     }
-
-    //     template <std::size_t I>
-    //     constexpr decltype(auto) get() const&& noexcept
-    //     {
-    //         using Leaf = tuple_leaf<I, type_at_t<I, Ts...>>;
-    //         return sc::move(static_cast<const Leaf&>(*this)).get();
-    //     }
-    // };
-
-    // choosing sc::tuple implementation
-
-    template <typename... Ts>
-    inline constexpr bool tuple_has_ref_v = (sc::is_reference_v<Ts> || ...);
-
-    // template <typename... T>
-    // class tuple
-    //     : public conditional_t<tuple_has_ref_v<T...>, tuple_leaf_based<T...>, tuple_packed<T...>>
-    // {
-    //     using base =
-    //         conditional_t<tuple_has_ref_v<T...>, tuple_leaf_based<T...>, tuple_packed<T...>>;
-
-    // public:
-    //     using base::base;
-    // };
-
     template <>
     class tuple<>
     {
@@ -345,7 +229,7 @@ namespace std
     template <typename T>
     struct tuple_size;
 
-	template<size_t I, typename T>
+    template <size_t I, typename T>
     struct tuple_element;
 
     template <class... Ts>

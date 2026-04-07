@@ -28,4 +28,6 @@ TEST_CASE("tuple_test")
 
     REQUIRE_EQ(sizeof(sc::tuple<char>), 1);
     REQUIRE_EQ(sizeof(std::tuple<char>), 1);
+
+	// TODO: copy-move constructors
 }
