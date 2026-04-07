@@ -17,6 +17,29 @@ namespace sc
 
     using nullptr_t = decltype(nullptr);
 
+    template <typename...>
+    using void_t = void;
+
+    template <typename T, T val>
+    struct integral_constant
+    {
+        static constexpr T value = val;
+        using value_type = T;
+        using type = integral_constant<T, val>;
+
+        constexpr operator value_type() const noexcept
+        {
+            return value;
+        }
+        constexpr value_type operator()() const noexcept
+        {
+            return value;
+        }
+    };
+
+    template <typename T, T val>
+    constexpr T integral_constant<T, val>::value;
+
     /**
      * Is Trivial
      * Reference: https://clang.llvm.org/docs/LanguageExtensions.html#type-trait-primitives
@@ -44,17 +67,29 @@ namespace sc
     template <typename T>
     inline constexpr bool is_pointer_v<T* const volatile> = true;
 
+    template <typename>
+    inline constexpr bool is_reference_v = false;
+
+    template <typename T>
+    inline constexpr bool is_reference_v<T&> = true;
+
+    template <typename T>
+    inline constexpr bool is_reference_v<T&&> = true;
+
     template <bool B, typename T, typename F>
     struct conditional
     {
-        typedef T type;
+        using type = T;
     };
 
     template <typename T, typename F>
     struct conditional<false, T, F>
     {
-        typedef F type;
+        using type = F;
     };
+
+    template <bool B, class T, class F>
+    using conditional_t = typename conditional<B, T, F>::type;
 
     /**
      * Remove const volatile from type
@@ -138,6 +173,122 @@ namespace sc
 
 #define SC_requires_signed(T)                                                                      \
     static_assert(is_integral_v<T> && T(-1) < T(0), "Expecting integral signed type.");
+
+    template <typename T>
+    inline constexpr bool is_const_v = __is_const(T);
+
+    template <typename T>
+    inline constexpr bool is_trivially_destructible_v =
+#if __has_builtin(__is_trivially_destructible)
+        __is_trivially_destructible(T);
+#elif __has_builtin(__has_trivial_destructor)
+        __has_trivial_destructor(T);
+#else
+#    error is_trivially_destructible is not implemented
+#endif
+
+#if __has_builtin(__add_pointer)
+    template <typename T>
+    struct add_pointer
+    {
+        using type = __add_pointer(T);
+    };
+#else
+    template <typename T, typename = void>
+    struct _add_pointer
+    {
+        using type = T;
+    };
+
+    template <typename T>
+    struct _add_pointer<T, void_t<T*>>
+    {
+        using type = T*;
+    };
+
+    template <typename T>
+    struct add_pointer : _add_pointer<T>
+    { };
+
+    template <typename T>
+    struct add_pointer<T&>
+    {
+        using type = T*;
+    };
+
+    template <typename T>
+    struct add_pointer<T&&>
+    {
+        using type = T*;
+    };
+#endif
+
+#if __has_builtin(__decay)
+    template <typename T>
+    struct decay
+    {
+        using type = __decay(T);
+    };
+#else
+    template <typename U>
+    struct decay_selector
+    {
+        using type = conditional_t<is_const_v<const U>, // trick: only function types and reference
+                                                        // types can't be const qualified
+                                   remove_const_volatile_t<U>, add_pointer<U>>;
+    };
+
+    template <typename U, size_t N>
+    struct decay_selector<U[N]>
+    {
+        using type = U*;
+    };
+
+    template <typename U>
+    struct decay_selector<U[]>
+    {
+        using type = U*;
+    };
+
+    template <typename T>
+    struct decay
+    {
+        using type = typename decay_selector<T>::type;
+    };
+
+    template <typename T>
+    struct decay<T&>
+    {
+        using type = typename decay_selector<T>::type;
+    };
+
+    template <typename T>
+    struct decay<T&&>
+    {
+        using type = typename decay_selector<T>::type;
+    };
+#endif
+
+    template <typename T>
+    using decay_t = typename decay<T>::type;
+
+    template <typename T, typename U, typename... Ts>
+    constexpr size_t type_index_v_impl()
+    {
+        if constexpr(is_same_v<remove_const_volatile_t<T>, remove_const_volatile_t<U>>) {
+            return 0;
+        } else {
+            static_assert(sizeof...(Ts) > 0, "type_index_v: type T is not in the pack");
+            return 1 + type_index_v_impl<T, Ts...>();
+        }
+    }
+
+    template <typename T, typename... Ts>
+    constexpr size_t type_index_v()
+    {
+        static_assert(sizeof...(Ts) > 0, "type_index_v: empty pack");
+        return type_index_v_impl<T, Ts...>();
+    }
 
     /* Implementing MOVE and FORWARD
      * Reference: https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/bits/move.h
@@ -236,6 +387,38 @@ namespace sc
 
     template <size_t Size>
     using make_index_sequence = make_integer_sequence<size_t, Size>;
+
+    template <typename T>
+    class reference_wrapper
+    {
+    public:
+        reference_wrapper(T& v)
+            : val {&v} { };
+
+        reference_wrapper(T&&) = delete;
+        
+        reference_wrapper(const reference_wrapper<T>& o)
+            : val {o.val} { };
+
+        reference_wrapper& operator=(const reference_wrapper<T>& o)
+        {
+            val = o.val;
+            return *this;
+		}            
+
+        operator T&() const noexcept
+        {
+            return *val;
+        };
+        
+        T& get() const noexcept
+        {
+            return *val;
+        };
+
+    private:
+        T* val;
+    };
 
 } // namespace sc
 
