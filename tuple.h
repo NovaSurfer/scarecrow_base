@@ -57,22 +57,53 @@ namespace sc
     template <typename... T>
     class tuple
     {
-        static_assert((sc::is_trivial_v<T> && ...),
-                      "sc::tuple works only with trivially constructible types");
+        static_assert((sc::is_trivially_destructible_v<T> && ...),
+                      "sc::tuple works only with trivially destructible types");
 
     public:
-        constexpr tuple(T&&... args)
+        template <typename... U>
+        constexpr tuple(U&&... args)
         {
-            initialize_storage(make_index_sequence<sizeof...(T)>(), sc::forward<T>(args)...);
+            static_assert(sizeof...(U) == sizeof...(T));
+            initialize_storage(make_index_sequence<sizeof...(T)>(), sc::forward<U>(args)...);
         }
 
         template <size_t I>
-        constexpr type_at_t<I, T...>& get() noexcept
+        constexpr type_at_t<I, T...>& get() & noexcept
         {
             static_assert(I < sizeof...(T), "get<I>() index out of range");
 
             constexpr size_t off = offset_for<I>();
-            return *std::launder(reinterpret_cast<type_at_t<I, T...>*>(storage + off));
+            return *reinterpret_cast<type_at_t<I, T...>*>(storage + off);
+        }
+
+        template <size_t I>
+        constexpr const type_at_t<I, T...>& get() const& noexcept
+        {
+            static_assert(I < sizeof...(T), "get<I>() index out of range");
+
+            constexpr size_t off = offset_for<I>();
+            return *reinterpret_cast<const type_at_t<I, T...>*>(storage + off);
+        }
+
+        template <size_t I>
+        constexpr type_at_t<I, T...>&& get() && noexcept
+        {
+            static_assert(I < sizeof...(T), "get<I>() index out of range");
+
+            constexpr size_t off = offset_for<I>();
+            return static_cast<type_at_t<I, T...>&&>(
+                *reinterpret_cast<type_at_t<I, T...>*>(storage + off));
+        }
+
+        template <size_t I>
+        constexpr const type_at_t<I, T...>&& get() const&& noexcept
+        {
+            static_assert(I < sizeof...(T), "get<I>() index out of range");
+
+            constexpr size_t off = offset_for<I>();
+            return static_cast<const type_at_t<I, T...>&&>(
+                *reinterpret_cast<const type_at_t<I, T...>*>(storage + off));
         }
 
     private:
@@ -87,12 +118,12 @@ namespace sc
             size_t offset;
         };
 
-        template <size_t... I>
-        constexpr auto initialize_storage(index_sequence<I...> idx, T&&... args)
+        template <size_t... I, typename... U>
+        constexpr auto initialize_storage(index_sequence<I...> idx, U&&... args)
         {
             constexpr auto info = get_members_info();
             (void(::new(storage + info[I].offset) type_at_t<info[I].original_index, T...>(
-                 get_arg_by_index<info[I].original_index>(sc::forward<T>(args)...))),
+                 get_arg_by_index<info[I].original_index>(sc::forward<U>(args)...))),
              ...);
         }
 
@@ -144,6 +175,188 @@ namespace sc
 
         alignas(sc::max_value(alignof(T)...)) uchar storage[(sizeof(T) + ...)];
     };
+
+    // template <size_t I, typename T>
+    // struct tuple_leaf
+    // {
+    //     T value;
+
+    //     constexpr tuple_leaf() = default;
+
+    //     template <class U>
+    //     constexpr tuple_leaf(U&& v)
+    //         : value(sc::forward<U>(v))
+    //     { }
+
+    //     constexpr T& get() & noexcept
+    //     {
+    //         return value;
+    //     }
+
+    //     constexpr const T& get() const& noexcept
+    //     {
+    //         return value;
+    //     }
+
+    //     constexpr T&& get() && noexcept
+    //     {
+    //         return static_cast<T&&>(value);
+    //     }
+
+    //     constexpr const T&& get() const&& noexcept
+    //     {
+    //         return static_cast<const T&&>(value);
+    //     }
+    // };
+
+    // template <size_t I, typename T>
+    // struct tuple_leaf<I, T&>
+    // {
+    //     T* ptr = nullptr;
+
+    //     tuple_leaf() = default;
+    //     constexpr tuple_leaf(T& ref)
+    //         : ptr(&ref)
+    //     { }
+
+    //     constexpr T& get() const noexcept
+    //     {
+    //         return *ptr;
+    //     }
+    // };
+
+    // template <class Seq, class... Ts>
+    // struct tuple_impl;
+
+    // template <size_t... Is, typename... Ts>
+    // struct tuple_impl<index_sequence<Is...>, Ts...> : tuple_leaf<Is, Ts>...
+    // {
+    //     constexpr tuple_impl() = default;
+
+    //     template <class... Us>
+    //     constexpr tuple_impl(Us&&... args)
+    //         : tuple_leaf<Is, Ts>(sc::forward<Us>(args))...
+    //     { }
+    // };
+
+    // template <class... Ts>
+    // class tuple_leaf_based : public tuple_impl<make_index_sequence<sizeof...(Ts)>, Ts...>
+    // {
+    //     using base = tuple_impl<make_index_sequence<sizeof...(Ts)>, Ts...>;
+
+    // public:
+    //     using base::base;
+
+    //     template <std::size_t I>
+    //     constexpr decltype(auto) get() & noexcept
+    //     {
+    //         using Leaf = tuple_leaf<I, type_at_t<I, Ts...>>;
+    //         return static_cast<Leaf&>(*this).get();
+    //     }
+
+    //     template <size_t I>
+    //     constexpr decltype(auto) get() const& noexcept
+    //     {
+    //         using Leaf = tuple_leaf<I, type_at_t<I, Ts...>>;
+    //         return static_cast<const Leaf&>(*this).get();
+    //     }
+
+    //     template <size_t I>
+    //     constexpr decltype(auto) get() && noexcept
+    //     {
+    //         using Leaf = tuple_leaf<I, type_at_t<I, Ts...>>;
+    //         return sc::move(static_cast<Leaf&>(*this)).get();
+    //     }
+
+    //     template <std::size_t I>
+    //     constexpr decltype(auto) get() const&& noexcept
+    //     {
+    //         using Leaf = tuple_leaf<I, type_at_t<I, Ts...>>;
+    //         return sc::move(static_cast<const Leaf&>(*this)).get();
+    //     }
+    // };
+
+    // choosing sc::tuple implementation
+
+    template <typename... Ts>
+    inline constexpr bool tuple_has_ref_v = (sc::is_reference_v<Ts> || ...);
+
+    // template <typename... T>
+    // class tuple
+    //     : public conditional_t<tuple_has_ref_v<T...>, tuple_leaf_based<T...>, tuple_packed<T...>>
+    // {
+    //     using base =
+    //         conditional_t<tuple_has_ref_v<T...>, tuple_leaf_based<T...>, tuple_packed<T...>>;
+
+    // public:
+    //     using base::base;
+    // };
+
+    template <>
+    class tuple<>
+    {
+    public:
+        constexpr tuple() noexcept = default;
+    };
+
+    template <class... U>
+    tuple(U&&...) -> tuple<decay_t<U>...>;
+
+    template <size_t I, class T>
+    struct tuple_element;
+
+    template <size_t I, class... Ts>
+    struct tuple_element<I, tuple<Ts...>>
+    {
+        using type = type_at_t<I, Ts...>;
+    };
+
+    template <size_t I, class T>
+    using tuple_element_t = typename tuple_element<I, T>::type;
+
+    // todo: add get_type_index_v
+    // https://github.com/electronicarts/EASTL/blob/9d2e8a090bceae2bb658bc45c3d4ee2d796cdf48/include/EASTL/meta.h#L26
+
+    template <size_t I, class... Ts>
+    constexpr decltype(auto) get(tuple<Ts...>& t) noexcept
+    {
+        return t.template get<I>();
+    }
+    template <size_t I, class... Ts>
+    constexpr decltype(auto) get(const tuple<Ts...>& t) noexcept
+    {
+        return t.template get<I>();
+    }
+    template <size_t I, class... Ts>
+    constexpr decltype(auto) get(tuple<Ts...>&& t) noexcept
+    {
+        return sc::move(t).template get<I>();
+    }
+    template <size_t I, class... Ts>
+    constexpr decltype(auto) get(const tuple<Ts...>&& t) noexcept
+    {
+        return sc::move(t).template get<I>();
+    }
+
 } // namespace sc
+
+namespace std
+{
+    template <typename T>
+    struct tuple_size;
+
+	template<size_t I, typename T>
+    struct tuple_element;
+
+    template <class... Ts>
+    struct tuple_size<sc::tuple<Ts...>> : sc::integral_constant<size_t, sizeof...(Ts)>
+    { };
+
+    template <size_t I, class... Ts>
+    struct tuple_element<I, sc::tuple<Ts...>>
+    {
+        using type = sc::type_at_t<I, Ts...>;
+    };
+} // namespace std
 
 #endif // SC_TUPLE_H
