@@ -8,9 +8,8 @@ namespace sc
 {
 
     template <typename T, size_t SIZE>
-    class arr
+    struct arr
     {
-    public:
         constexpr size_t size() const
         {
             return SIZE;
@@ -21,7 +20,6 @@ namespace sc
         constexpr void insert_at(const T* item, size_t index, size_t size);
         constexpr const T* get() const;
 
-    private:
         T data[SIZE];
     };
 
