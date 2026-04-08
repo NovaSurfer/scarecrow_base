@@ -10,22 +10,20 @@
 namespace sc
 {
 
-    class bitset64
+    struct bitset64
     {
-    public:
+        constexpr bool operator==(bitset64 other) const;
         constexpr bool is_zero() const;
         constexpr bool test_bit(u64 pos) const;
-        constexpr u64 and_bits(u64 other) const;
-        constexpr u64 or_bits(u64 other) const;
-        constexpr u64 xor_bits(u64 other) const;
+        constexpr bitset64 and_bits(bitset64 other) const;
+        constexpr bitset64 or_bits(bitset64 other) const;
+        constexpr bitset64 xor_bits(bitset64 other) const;
         constexpr u64 not_bits() const;
         constexpr u64 flip_bit(u64 pos) const;
 
-        constexpr bool operator==(u64 other) const;
+        void toggle_bit(u64 pos, bool on);
 
         u64 set;
-
-    private:
     };
 } // namespace sc
 

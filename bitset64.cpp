@@ -7,6 +7,11 @@
 namespace sc
 {
 
+    constexpr bool bitset64::operator==(bitset64 other) const
+    {
+        return set == other.set;
+    }
+
     constexpr bool bitset64::is_zero() const
     {
         return set == 0U;
@@ -17,19 +22,19 @@ namespace sc
         return set & (static_cast<u64>(1U) << pos);
     }
 
-    constexpr u64 bitset64::and_bits(u64 other) const
+     constexpr bitset64 bitset64::and_bits(bitset64 other) const
+     {
+         return {set & other.set};
+     }
+
+    constexpr sc::bitset64 bitset64::or_bits(bitset64 other) const
     {
-        return set & other;
+        return {set | other.set};
     }
 
-    constexpr u64 bitset64::or_bits(u64 other) const
+    constexpr bitset64 bitset64::xor_bits(bitset64 other) const
     {
-        return set | other;
-    }
-
-    constexpr u64 bitset64::xor_bits(u64 other) const
-    {
-        return set ^ other;
+        return {set ^ other.set};
     }
 
     constexpr u64 bitset64::not_bits() const
@@ -42,10 +47,13 @@ namespace sc
         return set ^ (static_cast<u64>(1U) << pos);
     }
 
-    constexpr bool bitset64::operator==(u64 other) const
-    {
-        return set == other;
-    }
+     void bitset64::toggle_bit(u64 pos, bool on)
+     {
+         if(on) {
+             set |= (static_cast<u64>(1U) << pos);
+         } else {
+             set &= (static_cast<u64>(1U) << pos);
+         }
+     }
 
 } // namespace sc
-
