@@ -5,51 +5,39 @@
 #ifndef SCARECROW2D_ENTITY_H
 #define SCARECROW2D_ENTITY_H
 
-#include "hash.h"
-#include "hashmap.h"
-#include "heap_alloc.h"
-#include "queue.h"
+#include "bitset64.h"
 #include "sc_types.h"
-#include <cassert>
-#include <functional>
-#include <queue>
-#include <vector>
 
-namespace sc2d
+namespace sc
 {
+    using entity_id = u32;
 
     struct entity
     {
-        u32 id;
-        [[nodiscard]] constexpr u32 index() const;
-        [[nodiscard]] constexpr u32 generation() const;
-        constexpr friend bool operator<(const entity& l, const entity& r);
-        constexpr bool operator!=(const entity& other) const
+        static constexpr u16 INDEX_BITS = 16;
+        static constexpr u16 INDEX_MASK = (1 << INDEX_BITS) - 1;
+        static constexpr u16 GENERATION_BITS = 1;
+        static constexpr u16 GENERATION_MASK = (1 << GENERATION_BITS) - 1;
+        static constexpr u16 MINIMUM_FREE_INDES = 1024;
+
+        [[nodiscard]] constexpr u32 index() const
         {
-            return !(id == other.id);
+            return id & INDEX_MASK;
         }
-        constexpr bool operator==(const entity& other) const
+
+        static constexpr u32 index_of_id(entity_id id)
         {
-            return id == other.id;
+            return id & INDEX_MASK;
         }
+
+        [[nodiscard]] constexpr u32 generation() const
+        {
+            return (id >> INDEX_BITS) & GENERATION_MASK;
+        }
+
+        bitset64 comps_bits;
+        entity_id id;
     };
+} // namespace sc
 
-    class entity_manager
-    {
-    public:
-        entity_manager(sc::heap_alloc& halloc);
-        bool alive(entity e);
-        entity create();
-        void destroy(entity e);
-
-    private:
-        std::queue<u32> free_indices;
-        sc::vec<u16> generation;
-    };
-}
-
-// Adds new hash template specialization for an entity struct
-template <>
-u32 sc::hash<>(sc2d::entity key);
-
-#endif //SCARECROW2D_ENTITY_H
+#endif // SCARECROW2D_ENTITY_H
