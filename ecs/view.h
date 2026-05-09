@@ -69,10 +69,10 @@ namespace sc
         };
 
     public:
-        constexpr basic_view(arr<const sparse_set<entity_id>*, sizeof...(Cs)> pools,
-                             tuple<component_manager<base_t<Cs>>*...> stores)
-            : pools {pools}
-            , stores {sc::move(stores)}
+        constexpr basic_view(arr<const sparse_set<entity_id>*, sizeof...(Cs)> in_pools,
+                             tuple<component_manager<base_t<Cs>>*...> in_stores)
+            : pools {in_pools}
+            , stores {sc::move(in_stores)}
             , leading {pick_leading()}
         { }
 
