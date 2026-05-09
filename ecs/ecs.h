@@ -49,7 +49,7 @@ namespace sc
                 &get_component_manager<remove_const_volatile_t<Cmps>>()->entities...};
 
             return basic_view<Cmps...>(pools, tuple {get_component_manager<Cmps>()...});
-        };
+        }
 
     private:
         template <typename Component>
