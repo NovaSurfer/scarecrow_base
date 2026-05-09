@@ -8,6 +8,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_definitions("-DSC_ALLOC_WITH_HEADER")
 
+set(SC_BASE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/..)
+
 set(TEST_SOURCES
         unit.cpp
         ../compiler.h
@@ -92,7 +94,10 @@ endif ()
 
 
 include(doctest.cmake)
-target_include_directories(sc_base_test PUBLIC ${CMAKE_SOURCE_DIR} ${doctest_SOURCE_DIR})
+target_include_directories(sc_base_test PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${SC_BASE_ROOT}
+  ${doctest_SOURCE_DIR})
 if (MSVC)
     target_link_libraries(sc_base_test Synchronization)
 endif ()
