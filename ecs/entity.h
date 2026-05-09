@@ -12,6 +12,9 @@ namespace sc
 {
     using entity_id = u32;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
     struct entity
     {
         static constexpr u16 INDEX_BITS = 16;
@@ -38,6 +41,9 @@ namespace sc
         bitset64 comps_bits;
         entity_id id;
     };
+
+#pragma GCC diagnostic pop
+
 } // namespace sc
 
 #endif // SCARECROW2D_ENTITY_H
