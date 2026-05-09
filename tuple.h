@@ -119,7 +119,7 @@ namespace sc
         };
 
         template <size_t... I, typename... U>
-        constexpr auto initialize_storage(index_sequence<I...> idx, U&&... args)
+        constexpr auto initialize_storage(index_sequence<I...>, U&&... args)
         {
             constexpr auto info = get_members_info();
             (void(::new(storage + info[I].offset) type_at_t<info[I].original_index, T...>(
