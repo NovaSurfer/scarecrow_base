@@ -224,11 +224,19 @@ namespace sc
 
 } // namespace sc
 
+
 namespace std
 {
+// Apple Clang hack
+#ifdef _LIBCPP_VERSION
+inline namespace _LIBCPP_ABI_NAMESPACE {    
+#endif
+
+    // not safe
     template <typename T>
     struct tuple_size;
 
+    // not safe, again
     template <size_t I, typename T>
     struct tuple_element;
 
@@ -241,6 +249,10 @@ namespace std
     {
         using type = sc::type_at_t<I, Ts...>;
     };
+#ifdef _LIBCPP_VERSION
+} // inline namespace _LIBCPP_ABI_NAMESPACE
+#endif
+   
 } // namespace std
 
 #endif // SC_TUPLE_H
